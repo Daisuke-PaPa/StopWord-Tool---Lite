@@ -31,22 +31,29 @@ const urlsToCache = [
 
 // Install event: Cache static assets
 self.addEventListener('install', (event) => {
+  console.log('Service Worker installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then((cache) => {
+        console.log('Caching essential files...');
         return cache.addAll(urlsToCache);
+      })
+      .catch((err) => {
+        console.log('Error during install:', err);
       })
   );
 });
 
 // Activate event: Clean up old caches
 self.addEventListener('activate', (event) => {
+  console.log('Service Worker activating...');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames.map((cacheName) => {
           if (!cacheWhitelist.includes(cacheName)) {
+            console.log('Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
@@ -61,16 +68,15 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((cachedResponse) => {
       // Return cached response if available
       if (cachedResponse) {
+        console.log('Returning cached response for:', event.request.url);
         return cachedResponse;
       }
 
       // If not cached, fetch from network
-      return fetch(event.request).catch(() => {
-        // Fallback to a custom offline page if network fetch fails
-        if (event.request.url.includes('.html')) {
-          return caches.match('/offline.html');
-        }
-        return null; // For non-HTML files, return nothing (or can add a fallback like a 404 page)
+      return fetch(event.request).catch((err) => {
+        // Fallback to cached assets if network fetch fails
+        console.log('Network request failed, returning from cache if possible:', event.request.url);
+        return caches.match(event.request);
       });
     })
   );
