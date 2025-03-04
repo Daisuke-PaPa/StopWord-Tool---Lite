@@ -1,0 +1,7 @@
+
+
+segment accepting blanks/linebreaks
+hidelist too if line break was inbetween legit items
+needs resizing
+
+‌ေ and other word connectors need to be concerned with CSW

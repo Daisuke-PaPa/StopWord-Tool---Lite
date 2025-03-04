@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stop Words Tool - Lite</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.png">
+    <link href="css/materialize.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/icon.css">
+    <style>
+
+@font-face {
+    font-family: 'Zawgyi-One';
+    src: url('fonts/Zawgyi-One.ttf') format('truetype');
+}
+
+
+        a {
+            cursor: pointer;
+        }
+
+
+    mark {
+    background-color: #8eee98;
+    color: rgb(34, 34, 34);
+    font-weight: 650;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+.scrollable-table {
+    width: 100%; 
+    height: 61vh;
+    max-height: 63vh;
+    overflow-y: auto; 
+    overflow-x: hidden;
+    color: white;
+    border: 1px solid #ccc;
+    padding: 5px 10px; /* Ensures content doesn't touch the edges */
+}
+
+.scrollable-table .row {
+    display: flex;
+    padding: 3px;
+    border-bottom: 1px solid #ccc;
+    align-items: flex-start; /* No more vertical centering */
+}
+
+.cell {
+    flex: 1;
+    white-space: pre-wrap; /* Prevents text from collapsing */
+    word-break: break-word; /* Ensures long words wrap correctly */
+    padding-left: 4px; /* Slight left padding to prevent cut-off */
+    overflow: hidden; /* Prevents weird overflows */
+    text-overflow: ellipsis; /* Adds "..." if the text overflows */
+}
+
+
+    .sw_tb_active {
+        background-color: rgb(59, 59, 59);
+    }
+    
+    .my-input {
+        white-space: nowrap; /* Prevents text wrapping */
+        overflow-x: auto; /* Enables horizontal scrolling */
+        font-size: 10px;
+    }
+
+    .my-input::placeholder {
+        text-align: center;
+    }
+
+
+    .flipped {
+        transform: scaleY(-1);
+        font-size: 23px;
+    }
+
+    .not-flipped {
+        font-size: 23px;
+    }
+    
+    .custom-textarea {
+        color: white;
+        resize: none;
+        background-color: #313131;
+        border-radius: 0.5%;
+        line-height: 36px;
+        white-space: pre-wrap;
+    }
+
+    .tn_hidden { display: none;}
+
+    body {
+        overflow: hidden; /* Hide scrollbars */
+        height:100vh;
+    }
+    </style>
+</head>
+<body style="background-color: #262626;">
+    <nav>
+        <div class="nav-wrapper">
+            <div class="brand-logo center" onclick="checkPayday()" style="cursor: pointer;">
+                <span style="font-size: 15px;" id="date"></span>
+                <img src="images/logo_mini.png">
+                <span style="font-size: 15px;" id="time"></span>  
+            </div>
+          <ul class="left">
+            <li><a class="dropdown-trigger waves-effect waves-light" data-target="file-menu">File</a></li>
+            <li><a class="dropdown-trigger waves-effect waves-light" data-target="segment-menu">Segmentation</a></li>
+            <li><a class="dropdown-trigger waves-effect waves-light" data-target="word-hide-menu">Preparation</a></li>
+            <li><a class="dropdown-trigger waves-effect waves-light" data-target="CSW-menu">StopWord Removal</a></li>
+        </ul>
+          <ul class="right">
+            <li>
+                <a class="increase-font waves-effect waves-light" onclick="undo();"><i class="material-icons">undo</i></a>
+            </li>
+            <li>
+                <a class="increase-font waves-effect waves-light" onclick="redo();"><i class="material-icons">redo</i></a>
+            </li>
+            <li>
+                <a class="increase-font waves-effect waves-light" onclick="increase_font_size()"><i class="material-icons">zoom_in</i></a>
+            </li>
+            <li>
+                <a class="decrease-font waves-effect waves-light" onclick="decrease_font_size()"><i class="material-icons">zoom_out</i></a>
+            </li>
+            <li>
+                <a class="decrease-font waves-effect waves-light" ><i class="material-icons" onclick="maximize();">crop_square</i></a>
+            </li>
+            <li>
+                <a class="decrease-font waves-effect waves-light" ><i class="material-icons" onclick="minimize();">minimize</i></a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+        <br>
+        <div class="row">
+            <div class="col s2">
+                <div class="input-field">
+                    <i class="material-icons prefix" style="color: white;">search</i>
+                    <input id="text_search" type="text" class="validate" style="color: white;">
+                    <label for="text_search">Search Document</label>
+                </div>
+                <div id="search-navigation" class="tn_hidden">
+                    <div class="section" style="color: white;">
+                        <div class="row valign-wrapper">
+                            <div class="col s6 left-align" id="search_count">
+                                3 results
+                            </div>
+                            <div class="col s6 right-align">
+                                <a onclick="searchAndSelectText('left')" style="color: white;"><span class="material-icons flipped">arrow_drop_down_circle</span></a>
+                                <a onclick="searchAndSelectText('right')" style="color: white;"><span class="material-icons not-flipped">arrow_drop_down_circle</span></a>
+                                <a onclick="toggleReplaceAllMenu()" style="color: white;"><span class="material-icons not-flipped">arrow_drop_down</span></a>
+                            </div>
+                        </div>
+                        <div id="replace-all-menu" class="center-align tn_hidden" style="border: 1px solid white; padding: 10px; border-radius: 5px;">
+                            <input type="text" id="searchtext" class="my-input" placeholder="Search" style="color: white; width: 45%;">
+                            <input type="text" id="replacetext" class="my-input" placeholder="Replace" style="color: white; width: 45%;">
+                            <a class="btn-small waves-effect waves-light" onclick="replaceAllText()">Replace All</a>
+                        </div>
+                    </div>
+                    <div class="scrollable-table" id="match_list_div">
+                    </div>                    
+                </div>
+            </div>
+            <div class="col s8">
+                <textarea id="main-text" placeholder="မုန့်စိန်လား?" class="custom-textarea" style="height: 85vh; width: 100%; font-size: 18px;line-height: 36px;"></textarea>
+            </div>
+            <div class="col s2" style="font-size: 17px; color: white; text-align: center;">
+                <span>StopWord List</span>
+                <textarea id="sw_list" class="custom-textarea" style="height:33vh;"></textarea>
+                <ul class="pagination" style="text-align: center;">
+                    <li class="waves-effect" id="sw_left" onclick="moveBackward()"><a ><i class="material-icons">chevron_left</i></a></li>
+                    <li class="active"><a id="sw_label" style="cursor: default;">က</a></li>
+                    <li class="waves-effect" id="sw_right" onclick="moveForward()"><a ><i class="material-icons">chevron_right</i></a></li>
+                </ul>
+                <div class="divider"></div>
+                <span>Compound StopWord List</span>
+                <textarea id="csw_list_textbox" class="custom-textarea" style="height:33vh;"></textarea>
+            </div>
+        </div>
+
+<!-- here lies hidden elements like dropdowns and modals-->
+      <!-- Dropdown Structure -->
+    <ul id="file-menu" class="dropdown-content">
+        <li><a onclick="openFile()">Open</a></li>
+        <li class="divider"></li>
+        <li><a onclick="saveFile()">Save</a></li>
+        <li class="divider"></li>
+        <li><a onclick="downloadFile()">Download</a></li>
+        <li class="divider"></li>
+        <li><a onclick="deleteSaveFile()">Delete</a></li>
+    </ul>
+
+    <ul id="segment-menu" class="dropdown-content">
+        <li><a onclick="deleteSpecialCharacters()">Segmentation</a></li>
+        <li class="divider"></li>
+        <li><a onclick="fixSpacing();applyFixSegments();">Fix Segment</a></li>
+        <li class="divider"></li> 
+        <li> <a class="modal-trigger" href="#add_segment_modal" onclick="document.getElementById('wrong_segment').value = '';document.getElementById('right_segment').value = '';">Add Segment</a></li>
+        <li class="divider"></li>
+        <li><a onclick="removeUnderscores()">Delete Underscores</a></li>
+    </ul>
+
+    <ul id="word-hide-menu" class="dropdown-content">
+        <li> <a class="modal-trigger" href="#add_hide_list" onclick="document.getElementById('hide_list').value = '';">Hide SW</a></li>
+        <li class="divider"></li>
+        <li><a onclick="create_sw_list();checkAndLoadSWList();showStatusNotification('StopWord list reset')" style="font-size: 15px;"><span class="material-icons" style="color: white;font-size: 16px;">restart_alt</span>SW List</a></li>
+        <li class="divider"></li>
+        <li><a onclick="loadSWTextFile()" style="font-size: 15px;"><span class="material-icons" style="color: white;font-size: 16px;">description</span>SW File</a></li>
+        <li class="divider"></li>
+        <li><a onclick="fixSpacing();showStatusNotification('Spacing fixed!')">Fix Spacings</a></li>
+    </ul>
+
+    <ul id="CSW-menu" class="dropdown-content">
+        <li> <a class="modal-trigger" href="#add_csw_list" onclick="document.getElementById('hide_list').value = '';">Add CSW</a></li>
+        <li class="divider"></li>
+        <li> <a onclick="processCSWMatches()">Get CSW List</a></li>
+        <li class="divider"></li>
+        <li> <a class="modal-trigger" onclick="csw_delete()">Delete CSW</a></li>
+    </ul>
+
+    <!-- segment add model -->
+  <!-- Modal Structure -->
+  <div id="add_segment_modal" class="modal">
+        <div class="modal-content" style="text-align: center;">
+            <h5>Please add segment error</h5>
+            <div class="row">
+                <div class="col s6"><textarea id="wrong_segment" class="custom-textarea" placeholder="e.g.‌‌ေ_ မ_ ာ_ င_ ်_ "></textarea></div>
+                <div class="col s6"><textarea id="right_segment" class="custom-textarea" placeholder="e.g. မောင်"></textarea></div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a class="waves-effect waves-green btn" onclick="add_segment()">Add Segment</a>
+        </div>
+  </div>
+
+  <div id="add_hide_list" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <h5>Please add words to hide</h5>
+        <textarea id="hide_list" class="custom-textarea" placeholder="e.g. ကိုကြီး ဆိုဖျက်မရဘူးလေ hideရမှာ။ ကိုကြီးတွေမကောင်းပါ :)"></textarea>
+    </div>
+    <div class="modal-footer">
+        <a class="waves-effect waves-green btn" onclick="add_hide_list()">Add Word</a>
+    </div>
+</div>
+
+<div id="add_csw_list" class="modal">
+    <div class="modal-content" style="text-align: center;">
+        <h5>Add word to Compound StopWord List</h5>
+        <textarea id="csw_list_input" class="custom-textarea" placeholder="e.g. ရှိသည် ၊ ဖြစ်သည် ၊ ချစ်သည် - ချမ်းချမ်း"></textarea>
+    </div>
+    <div class="modal-footer">
+        <a class="waves-effect waves-green btn" onclick="add_csw_list()">Add Word</a>
+    </div>
+</div>
+
+//all js
+    <script src="libs/mammoth.browser.min.js"></script>
+    <script src="libs/materialize.js"></script>
+    <script src="libs/notify_box.js"></script>
+    <script src="libs/ini_database.js"></script>
+    <script src="libs/special_character_delete.js"></script>
+    <script src="libs/fix_segment.js"></script>
+    <script src="libs/add_segment.js"></script>
+    <script src="libs/add_hide_list.js"></script>
+    <script src="libs/hide_words.js"></script>
+    <script src="libs/text_search.js"></script>
+    <script src="libs/sw_list.js"></script>
+    <script src="libs/undo_redo.js"></script>
+    <script src="libs/add_csw_list.js"></script>
+    <script src="libs/fetch_csw_list.js"></script>
+    <script src="libs/zg_to_unicode.js"></script>
+    <script src="libs/service-worker.js"></script>
+    <script src="scripts.js"></script>
+
+    <script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+              .then((registration) => {
+                console.log('Service Worker registered with scope:', registration.scope);
+              })
+              .catch((error) => {
+                console.error('Service Worker registration failed:', error);
+              });
+          });
+        }
+      </script>
+      
+</body>
+</html>
