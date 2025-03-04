@@ -1,5 +1,3 @@
-// service-worker.js
-
 const CACHE_NAME = 'stopwords-tool-cache-v1';
 const urlsToCache = [
   '/',
@@ -60,14 +58,20 @@ self.addEventListener('activate', (event) => {
 // Fetch event: Serve cached content or fetch from network if not cached
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request)
-      .then((cachedResponse) => {
-        // Return cached response if available
-        if (cachedResponse) {
-          return cachedResponse;
+    caches.match(event.request).then((cachedResponse) => {
+      // Return cached response if available
+      if (cachedResponse) {
+        return cachedResponse;
+      }
+
+      // If not cached, fetch from network
+      return fetch(event.request).catch(() => {
+        // Fallback to a custom offline page if network fetch fails
+        if (event.request.url.includes('.html')) {
+          return caches.match('/offline.html');
         }
-        // Else, fetch from the network
-        return fetch(event.request);
-      })
+        return null; // For non-HTML files, return nothing (or can add a fallback like a 404 page)
+      });
+    })
   );
 });
