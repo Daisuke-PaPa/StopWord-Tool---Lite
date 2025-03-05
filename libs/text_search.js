@@ -7,28 +7,28 @@ function toggleReplaceAllMenu() {
 document.addEventListener("DOMContentLoaded", function () {
     const searchBox = document.getElementById("text_search");
     const searchDirection = 'right';  // Default direction
+    let previousValue = ""; // Track the previous input value
+    let debounceTimer;
 
-    // Make the listener async so we can await hideWords()
-    searchBox.addEventListener("keydown", async function (event) {
-        if (event.key === "Enter" && searchBox.value) {
-            document.getElementById('searchtext').value = searchBox.value;
-            
-            // Reset search index
-            current_search_index = -1;
-            
-            // Wait for hideWords to finish processing
-            await hideWords();
-            
-            // Now perform the search
-            searchAndSelectText(searchDirection);
-            
-            // Prevent form submission if inside a form
-            event.preventDefault();
-        }
+    searchBox.addEventListener("input", function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(async () => {
+            if (searchBox.value && searchBox.value !== previousValue) {
+                previousValue = searchBox.value;
+                document.getElementById('searchtext').value = searchBox.value;
+
+                // Reset search index
+                current_search_index = -1;
+
+                // Wait for hideWords to finish processing
+                await hideWords();
+
+                // Now perform the search
+                searchAndSelectText(searchDirection);
+            }
+        }, 1000); // 500ms debounce timeout
     });
 });
-
-
 
 /**
  * Checks if the match at matchIndex (with given length)
@@ -231,15 +231,15 @@ async function countAndDisplayMatches() {
 document.addEventListener("DOMContentLoaded", function () {
     const searchBox = document.getElementById("text_search");
 
-    // Listen for Ctrl + F (or Command + F on macOS)
     document.addEventListener("keydown", function (event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === "f") {
+        if ((event.ctrlKey || event.metaKey) && event.code === "KeyF") {
             event.preventDefault(); // Prevent the default browser find dialog
             searchBox.focus();      // Focus the search box
             searchBox.select();     // Select all text in the search box
         }
     });
 });
+
 
 //fucking hide it
 document.addEventListener("DOMContentLoaded", function () {

@@ -12,10 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Handle Ctrl + S for Save
 document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.key === 's') {
-        e.preventDefault(); // Prevent default save behavior
-        saveFile();
-    }
+  if ((e.ctrlKey || e.metaKey) && e.code === 'KeyS') {
+      e.preventDefault(); // Prevent default save behavior
+      saveFile();
+  }
 });
 
 // Save File Function (Save as .txt with same filename)

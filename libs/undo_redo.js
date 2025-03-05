@@ -33,27 +33,26 @@ function initTextArea() {
             isSaving = false;
         });
 
-        // Prevent default Ctrl+Z and Ctrl+Y behavior
         document.addEventListener('keydown', function (e) {
             if (e.ctrlKey || e.metaKey) {
                 const isTextAreaFocused = document.activeElement === textArea;
                 const isInputOrTextAreaFocused = document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT';
-
-                if (e.key === 'z') {
+        
+                if (e.code === 'KeyZ') {
                     e.preventDefault();
                     if (isTextAreaFocused || (!isInputOrTextAreaFocused && !isTextAreaFocused)) {
                         undo();
                     }
                 }
-
-                if (e.key === 'y') {
+        
+                if (e.code === 'KeyY') {
                     e.preventDefault();
                     if (isTextAreaFocused || (!isInputOrTextAreaFocused && !isTextAreaFocused)) {
                         redo();
                     }
                 }
             }
-        });
+        });        
 
         // Initial save state (when the page loads)
         saveState(textArea.value);
