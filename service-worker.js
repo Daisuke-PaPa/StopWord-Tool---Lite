@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stopwords-tool-cache-v1'; // update the version to force new caching when assets change
+const CACHE_NAME = 'stopwords-tool-cache-v2'; // update the version to force new caching when assets change
 const urlsToCache = [
   '/',
   '/StopWord-Tool---Lite/index.html',
@@ -25,7 +25,8 @@ const urlsToCache = [
   '/StopWord-Tool---Lite/libs/sw_list.js',
   '/StopWord-Tool---Lite/libs/text_search.js',
   '/StopWord-Tool---Lite/libs/undo_redo.js',
-  '/StopWord-Tool---Lite/libs/zg_to_unicode.js'
+  '/StopWord-Tool---Lite/libs/zg_to_unicode.js',
+  '/StopWord-Tool---Lite/libs/db_manage.js'
 ];
 
 self.addEventListener('install', (event) => {

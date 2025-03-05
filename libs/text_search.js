@@ -7,26 +7,24 @@ function toggleReplaceAllMenu() {
 document.addEventListener("DOMContentLoaded", function () {
     const searchBox = document.getElementById("text_search");
     const searchDirection = 'right';  // Default direction
-    let previousValue = ""; // Track the previous input value
-    let debounceTimer;
 
-    searchBox.addEventListener("input", function () {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(async () => {
-            if (searchBox.value && searchBox.value !== previousValue) {
-                previousValue = searchBox.value;
-                document.getElementById('searchtext').value = searchBox.value;
-
-                // Reset search index
-                current_search_index = -1;
-
-                // Wait for hideWords to finish processing
-                await hideWords();
-
-                // Now perform the search
-                searchAndSelectText(searchDirection);
-            }
-        }, 1000); // 500ms debounce timeout
+    // Make the listener async so we can await hideWords()
+    searchBox.addEventListener("keydown", async function (event) {
+        if (event.key === "Enter" && searchBox.value) {
+            document.getElementById('searchtext').value = searchBox.value;
+            
+            // Reset search index
+            current_search_index = -1;
+            
+            // Wait for hideWords to finish processing
+            await hideWords();
+            
+            // Now perform the search
+            searchAndSelectText(searchDirection);
+            
+            // Prevent form submission if inside a form
+            event.preventDefault();
+        }
     });
 });
 
@@ -178,11 +176,16 @@ async function countAndDisplayMatches() {
         }
     }
 
-    // Update the search count display.
-    const searchCountDiv = document.getElementById("search_count");
-    if (searchCountDiv) {
-        searchCountDiv.textContent = `${matchCount} found`;
-    }
+// Update the search count display.
+const searchCountDiv = document.getElementById("search_count");
+if (searchCountDiv) {
+    // Find the position in the validMatches array where the matchIndex equals current_search_index.
+    const currentPosition = validMatches.findIndex(match => match.matchIndex === current_search_index);
+    // If found, add 1 for human-friendly indexing, otherwise default to 0.
+    const displayCurrent = currentPosition >= 0 ? currentPosition + 1 : 0;
+    const totalMatches = validMatches.length;
+    searchCountDiv.textContent = `Found: ${displayCurrent}/${totalMatches}`;
+}
 
     // Clear previous match results.
     matchListDiv.innerHTML = "";
@@ -235,7 +238,6 @@ document.addEventListener("DOMContentLoaded", function () {
         if ((event.ctrlKey || event.metaKey) && event.code === "KeyF") {
             event.preventDefault(); // Prevent the default browser find dialog
             searchBox.focus();      // Focus the search box
-            searchBox.select();     // Select all text in the search box
         }
     });
 });

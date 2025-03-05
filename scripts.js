@@ -9,6 +9,14 @@ document.addEventListener('DOMContentLoaded', function() {
     var instances = M.Modal.init(elems);
   });
 
+  document.addEventListener('DOMContentLoaded', function() {
+    ini_select_shit();
+  });
+
+function ini_select_shit() {
+  var elems = document.querySelectorAll('select');
+  var instances = M.FormSelect.init(elems);
+}
 
 // Handle Ctrl + S for Save
 document.addEventListener('keydown', (e) => {
@@ -201,4 +209,11 @@ setInterval(updateClock, 1000);
 // Initial call to set the clock immediately
 updateClock();
 
+function textbox()
+{
+        var ctl = document.getElementById('main-text');
+        var startPos = ctl.selectionStart;
+        var endPos = ctl.selectionEnd;
+        alert(startPos + ", " + endPos);
+}
 

@@ -42,21 +42,43 @@ async function add_hide_list() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+    let savedState = null; // Global state to hold the textarea's cursor and scroll positions
+  
     const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.target.matches(".modal")) {
-                // Check if the modal is hidden
-                if (getComputedStyle(mutation.target).display === "none" || !mutation.target.offsetParent) {
-                    const textArea = document.getElementById("main-text");
-                    if (textArea && document.activeElement !== textArea) {
-                        textArea.focus();
-                    }
-                }
-            }
-        });
+      mutations.forEach((mutation) => {
+        if (mutation.target.matches(".modal")) {
+          const modal = mutation.target;
+          const textArea = document.getElementById("main-text");
+          const isVisible = window.getComputedStyle(modal).display !== "none";
+  
+          // When modal becomes visible, save the state (only once)
+          if (isVisible && savedState === null && textArea) {
+            savedState = {
+              selectionStart: textArea.selectionStart,
+              selectionEnd: textArea.selectionEnd,
+              scrollTop: textArea.scrollTop,
+              scrollLeft: textArea.scrollLeft
+            };
+            console.log("State saved:", savedState);
+          }
+          // When modal becomes hidden, restore the state
+          else if (!isVisible && savedState !== null && textArea) {
+            // Use a minimal delay to let the modal finish hiding
+            setTimeout(() => {
+              textArea.focus({ preventScroll: true });
+              textArea.setSelectionRange(savedState.selectionStart, savedState.selectionEnd);
+              textArea.scrollTop = savedState.scrollTop;
+              textArea.scrollLeft = savedState.scrollLeft;
+              console.log("State restored:", savedState);
+              savedState = null; // Clear saved state after restoring
+            }, 0);
+          }
+        }
+      });
     });
-
+  
+    // Observe style and class changes on all elements with the class "modal"
     document.querySelectorAll(".modal").forEach(modal => {
-        observer.observe(modal, { attributes: true, attributeFilter: ["style", "class"] });
+      observer.observe(modal, { attributes: true, attributeFilter: ["style", "class"] });
     });
-});
+  });

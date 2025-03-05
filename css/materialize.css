@@ -7162,6 +7162,7 @@ select {
 
 .select-wrapper {
   position: relative;
+  color: white;
 }
 
 .select-wrapper.valid + label,
@@ -7189,6 +7190,7 @@ select {
       -ms-user-select: none;
           user-select: none;
   z-index: 1;
+  color: white;
 }
 
 .select-wrapper input.select-dropdown:focus {

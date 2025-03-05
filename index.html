@@ -21,8 +21,8 @@
 
 
     mark {
-    background-color: #8eee98;
-    color: rgb(34, 34, 34);
+    background-color: blue;
+    color: white;
     font-weight: 650;
     padding-top: 2px;
     padding-bottom: 2px;
@@ -57,7 +57,12 @@
 
 
     .sw_tb_active {
-        background-color: rgb(59, 59, 59);
+        background-color: rgb(71, 71, 71);
+        color: white;
+    }
+
+    .sw_tb_active mark {
+        color:rgb(0, 0, 0);background-color: yellow;
     }
     
     .my-input {
@@ -188,6 +193,8 @@
         <li><a onclick="saveFile()">Save</a></li>
         <li class="divider"></li>
         <li><a onclick="downloadFile()">Download</a></li>
+        <li class="divider"></li>
+        <li><a class="modal-trigger" href="#database">Database</a></li>
         <!--<li class="divider"></li>
         <li><a onclick="deleteSaveFile()">Delete</a></li>-->
     </ul>
@@ -255,7 +262,38 @@
     </div>
 </div>
 
-//all js
+<div id="database" class="modal">
+    <br>
+    <div class="modal-content" style="text-align: center;">
+        <h5>Database Management</h5>
+        <div class="row">
+        <div class="input-field col s6">
+            <select id="db_action">
+                <option disabled selected>Select Action</option>
+                <option value="create">Create</option>
+                <option value="rename">Rename</option>
+                <option value="delete">Delete</option>
+            </select>
+        </div>
+        <div class="input-field col s6 tn_hidden" id="db_select_div">
+            <select id="db_select">
+              <option disabled selected>Select Database</option>
+            </select>
+        </div>
+        <script src="libs/db_manage.js"></script>
+        <script>populateDatabaseList();</script>
+        <div class="input-field col s6 tn_hidden" id="db_name">
+            <input id="db_name_input" type="text" style="color: white;" placeholder="နာမည်ထည့်ပါ">
+        </div>
+        <br><br><br><br><br><br>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <a class="waves-effect waves-green btn" onclick="manage_db()">Confirm</a>
+    </div>
+</div>
+
+<!-- all js -->
     <script src="libs/mammoth.browser.min.js"></script>
     <script src="libs/materialize.js"></script>
     <script src="libs/notify_box.js"></script>
