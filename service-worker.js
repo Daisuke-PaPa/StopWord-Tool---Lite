@@ -21,7 +21,6 @@ const urlsToCache = [
   '/StopWord-Tool---Lite/libs/mammoth.browser.min.js',
   '/StopWord-Tool---Lite/libs/materialize.js',
   '/StopWord-Tool---Lite/libs/notify_box.js',
-  '/StopWord-Tool---Lite/libs/service-worker.js',
   '/StopWord-Tool---Lite/libs/special_character_delete.js',
   '/StopWord-Tool---Lite/libs/sw_list.js',
   '/StopWord-Tool---Lite/libs/text_search.js',
