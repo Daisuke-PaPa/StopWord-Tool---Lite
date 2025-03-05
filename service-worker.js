@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stopwords-tool-cache-v3'; // update the version to force new caching when assets change
+const CACHE_NAME = 'stopwords-tool-cache-v3';
 const urlsToCache = [
   '/',
   '/StopWord-Tool---Lite/index.html',
@@ -21,7 +21,7 @@ const urlsToCache = [
   '/StopWord-Tool---Lite/libs/mammoth.browser.min.js',
   '/StopWord-Tool---Lite/libs/materialize.js',
   '/StopWord-Tool---Lite/libs/notify_box.js',
-  '/StopWord-Tool---Lite/libs/service-worker.js',
+  // Removed service-worker.js from the cache list.
   '/StopWord-Tool---Lite/libs/special_character_delete.js',
   '/StopWord-Tool---Lite/libs/sw_list.js',
   '/StopWord-Tool---Lite/libs/text_search.js',
@@ -31,7 +31,7 @@ const urlsToCache = [
 
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing...');
-  // Immediately activate the new service worker
+  // Force the waiting service worker to become the active service worker
   self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
@@ -76,7 +76,7 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
       return fetch(event.request).catch(() => {
-        // Fallback: for navigation requests (e.g., when offline), serve index.html
+        // For navigation requests, serve index.html as a fallback
         if (event.request.mode === 'navigate') {
           return caches.match('/StopWord-Tool---Lite/index.html');
         }
