@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stopwords-tool-cache-v0'; // update the version to force new caching when assets change
+const CACHE_NAME = 'stopwords-tool-cache-v1'; // update the version to force new caching when assets change
 const urlsToCache = [
   '/',
   '/StopWord-Tool---Lite/index.html',
