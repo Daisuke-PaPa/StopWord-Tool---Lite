@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stopwords-tool-cache-v3';
+const CACHE_NAME = 'stopwords-tool-cache-v0';
 const urlsToCache = [
   '/',
   '/StopWord-Tool---Lite/index.html',
@@ -21,7 +21,6 @@ const urlsToCache = [
   '/StopWord-Tool---Lite/libs/mammoth.browser.min.js',
   '/StopWord-Tool---Lite/libs/materialize.js',
   '/StopWord-Tool---Lite/libs/notify_box.js',
-  // Removed service-worker.js from the cache list.
   '/StopWord-Tool---Lite/libs/special_character_delete.js',
   '/StopWord-Tool---Lite/libs/sw_list.js',
   '/StopWord-Tool---Lite/libs/text_search.js',
@@ -31,24 +30,12 @@ const urlsToCache = [
 
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing...');
-  // Force the waiting service worker to become the active service worker
-  self.skipWaiting();
+  self.skipWaiting(); // Immediately activate new SW
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Service Worker: Caching assets...');
-      return Promise.all(
-        urlsToCache.map((url) =>
-          fetch(url, { cache: 'no-cache' })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`Failed to fetch ${url}`);
-              }
-              return cache.put(url, response.clone());
-            })
-            .catch((error) => console.warn(`Service Worker: Failed to cache ${url}:`, error))
-        )
-      );
-    })
+      return cache.addAll(urlsToCache);
+    }).catch((error) => console.error('Service Worker: Caching failed:', error))
   );
 });
 
@@ -76,7 +63,6 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
       return fetch(event.request).catch(() => {
-        // For navigation requests, serve index.html as a fallback
         if (event.request.mode === 'navigate') {
           return caches.match('/StopWord-Tool---Lite/index.html');
         }
