@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stopwords-tool-cache-v2';
+const CACHE_NAME = 'stopwords-tool-cache-v3'; // update the version to force new caching when assets change
 const urlsToCache = [
   '/',
   '/StopWord-Tool---Lite/index.html',
@@ -31,12 +31,14 @@ const urlsToCache = [
 
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing...');
+  // Immediately activate the new service worker
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Service Worker: Caching assets...');
       return Promise.all(
         urlsToCache.map((url) =>
-          fetch(url, { cache: "no-cache" })
+          fetch(url, { cache: 'no-cache' })
             .then((response) => {
               if (!response.ok) {
                 throw new Error(`Failed to fetch ${url}`);
@@ -52,18 +54,17 @@ self.addEventListener('install', (event) => {
 
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activating...');
-  const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then((cacheNames) =>
       Promise.all(
         cacheNames.map((cacheName) => {
-          if (!cacheWhitelist.includes(cacheName)) {
+          if (cacheName !== CACHE_NAME) {
             console.log('Service Worker: Deleting old cache', cacheName);
             return caches.delete(cacheName);
           }
         })
       )
-    )
+    ).then(() => self.clients.claim())
   );
 });
 
@@ -75,8 +76,8 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
       return fetch(event.request).catch(() => {
-        // Fallback: serve index.html for navigation requests (documents)
-        if (event.request.destination === 'document') {
+        // Fallback: for navigation requests (e.g., when offline), serve index.html
+        if (event.request.mode === 'navigate') {
           return caches.match('/StopWord-Tool---Lite/index.html');
         }
       });
