@@ -209,11 +209,3 @@ setInterval(updateClock, 1000);
 // Initial call to set the clock immediately
 updateClock();
 
-function textbox()
-{
-        var ctl = document.getElementById('main-text');
-        var startPos = ctl.selectionStart;
-        var endPos = ctl.selectionEnd;
-        alert(startPos + ", " + endPos);
-}
-

@@ -1,69 +1,107 @@
-let db; // Global reference for the database
+// Global reference for the database and active database name
+let db;
+let activeDBName = localStorage.getItem("active_database");
 
-const request = indexedDB.open("sw_data");
+// Function to initialize the IndexedDB using activeDBName
+function initDB() {
+    const request = indexedDB.open(activeDBName);
 
-request.onupgradeneeded = (event) => {
-    db = event.target.result;
-    console.log(`Database 'sw_data' created/upgraded to version ${db.version}.`);
+    request.onupgradeneeded = (event) => {
+        db = event.target.result;
+        console.log(`Database '${activeDBName}' created/upgraded to version ${db.version}.`);
 
-    // Create object stores if they don't exist
-    ["csw_list", "fix_segment", "hide_list"].forEach((store) => {
-        if (!db.objectStoreNames.contains(store)) {
-            db.createObjectStore(store, { autoIncrement: true }); // Auto-generate keys
-        }
-    });
-};
+        // Create object stores if they don't exist
+        ["csw_list", "fix_segment", "hide_list"].forEach((store) => {
+            if (!db.objectStoreNames.contains(store)) {
+                db.createObjectStore(store, { autoIncrement: true }); // Auto-generate keys
+            }
+        });
+    };
 
-request.onsuccess = (event) => {
-    db = event.target.result;
-    console.log(`Database 'sw_data' is ready. Version: ${db.version}`);
-};
+    request.onsuccess = (event) => {
+        db = event.target.result;
+        console.log(`Database '${activeDBName}' is ready. Version: ${db.version}`);
+    };
 
-request.onerror = (event) => {
-    console.error("Error opening database:", event.target.error);
-};
-
-
+    request.onerror = (event) => {
+        console.error("Error opening database:", event.target.error);
+    };
+}
 
 // Universal function to check if a group exists (generic)
 function checkGroupExists(groupName) {
     return new Promise((resolve, reject) => {
-        const request = indexedDB.open("sw_data");
-
-        request.onsuccess = function(event) {
-            const db = event.target.result;
-
-            // Check if the object store (group) exists
-            if (db.objectStoreNames.contains(groupName)) {
-                resolve(true); // Group exists
-            } else {
-                resolve(false); // Group does not exist
-            }
-        };
-
-        request.onerror = function(event) {
-            reject(event.target.error); // Error during the check
-        };
+        if (db) {
+            // If global db is available, check directly
+            resolve(db.objectStoreNames.contains(groupName));
+        } else {
+            // Otherwise, open the database and check
+            const req = indexedDB.open(activeDBName);
+            req.onsuccess = (event) => {
+                const tempDB = event.target.result;
+                resolve(tempDB.objectStoreNames.contains(groupName));
+            };
+            req.onerror = (event) => {
+                reject(event.target.error);
+            };
+        }
     });
 }
 
 // Universal function to add data to a specified group (generic)
 function addDataToGroup(groupName, data) {
+    if (!db) {
+        console.error("Database not initialized");
+        return;
+    }
     const transaction = db.transaction(groupName, 'readwrite');
     const store = transaction.objectStore(groupName);
 
     const request = store.add(data);
 
-    request.onsuccess = function() {
+    request.onsuccess = () => {
         console.log(`Data added to ${groupName} group.`);
     };
 
-    request.onerror = function(event) {
+    request.onerror = (event) => {
         console.error(`Error adding data to ${groupName}:`, event.target.error);
     };
 }
 
+// Determine activeDBName: check if one is set, otherwise list existing databases (if supported)
+if (!activeDBName) {
+    if (indexedDB.databases) {
+        indexedDB.databases().then((databases) => {
+            if (databases.length > 0) {
+                // Use the last created database or default to "sw_data" if name is not available
+                activeDBName = databases[databases.length - 1].name || "sw_data";
+            } else {
+                activeDBName = "sw_data";
+            }
+            localStorage.setItem("active_database", activeDBName);
+            initDB();
+        }).catch((error) => {
+            console.error("Error listing databases:", error);
+            activeDBName = "sw_data";
+            localStorage.setItem("active_database", activeDBName);
+            initDB();
+        });
+    } else {
+        // Fallback if indexedDB.databases() is not supported
+        activeDBName = "sw_data";
+        localStorage.setItem("active_database", activeDBName);
+        initDB();
+    }
+} else {
+    // If activeDBName exists in localStorage, initialize DB immediately
+    initDB();
+}
+
+
+//depricated
 let upgradeInProgress = false; // Prevents multiple upgrades at the same time
+
+
 
 function createGroup(groupName) {
     return new Promise((resolve, reject) => {

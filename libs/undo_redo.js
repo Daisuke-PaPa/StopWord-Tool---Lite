@@ -19,6 +19,8 @@ function initTextArea() {
             isSaving = true;
 
             const currentValue = textArea.value;
+            const cursorPosition = textArea.selectionStart; // Get cursor position
+
             if (currentValue !== lastSavedText) {
                 // If we're not at the end of the history, remove future history steps
                 if (currentHistoryIndex < history.length - 1) {
@@ -26,7 +28,7 @@ function initTextArea() {
                 }
 
                 // Save the current state
-                saveState(currentValue);
+                saveState(currentValue, cursorPosition);
                 lastSavedText = currentValue;
             }
 
@@ -55,16 +57,16 @@ function initTextArea() {
         });        
 
         // Initial save state (when the page loads)
-        saveState(textArea.value);
+        saveState(textArea.value, textArea.selectionStart);
     }
 }
 
-// Save the current state of the textarea to history
-function saveState(currentValue) {
+// Save the current state of the textarea to history, including cursor position
+function saveState(currentValue, cursorPosition) {
     if (history.length >= maxHistory) {
         history.shift(); // Remove the oldest entry if max limit is reached
     }
-    history.push(currentValue);
+    history.push({ text: currentValue, cursor: cursorPosition });
     currentHistoryIndex = history.length - 1;
 }
 
@@ -72,7 +74,7 @@ function saveState(currentValue) {
 function undo() {
     if (currentHistoryIndex > 0) {
         currentHistoryIndex--;
-        textArea.value = history[currentHistoryIndex];
+        restoreState(history[currentHistoryIndex]);
     }
 }
 
@@ -80,7 +82,24 @@ function undo() {
 function redo() {
     if (currentHistoryIndex < history.length - 1) {
         currentHistoryIndex++;
-        textArea.value = history[currentHistoryIndex];
+        restoreState(history[currentHistoryIndex]);
+    }
+}
+
+// Restore a saved state, including cursor position
+function restoreState(state) {
+    if (textArea) {
+        textArea.value = state.text;
+        setCursorPosition(state.cursor);
+    }
+}
+
+// Set the cursor position in the text area
+function setCursorPosition(index) {
+    if (textArea) {
+        textArea.selectionStart = textArea.selectionEnd = index;
+        textArea.blur();
+        textArea.focus();
     }
 }
 
@@ -88,7 +107,8 @@ function redo() {
 function manualValueChange(newValue) {
     if (textArea) {
         textArea.value = newValue;
-        saveState(newValue);
+        const lastCursor = history.length ? history[history.length - 1].cursor : 0; // Use last known cursor position
+        saveState(newValue, lastCursor);
     }
 }
 

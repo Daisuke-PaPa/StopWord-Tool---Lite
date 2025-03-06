@@ -194,7 +194,7 @@
         <li class="divider"></li>
         <li><a onclick="downloadFile()">Download</a></li>
         <li class="divider"></li>
-        <li><a class="modal-trigger" href="#database">Database</a></li>
+        <li><a class="modal-trigger" onclick="populateDatabaseList();" href="#database">Database</a></li>
         <!--<li class="divider"></li>
         <li><a onclick="deleteSaveFile()">Delete</a></li>-->
     </ul>
@@ -273,6 +273,8 @@
                 <option value="create">Create</option>
                 <option value="rename">Rename</option>
                 <option value="delete">Delete</option>
+                <option value="switch_to">Switch To</option>
+                <option value="duplicate">Duplicate</option>
             </select>
         </div>
         <div class="input-field col s6 tn_hidden" id="db_select_div">
@@ -288,7 +290,7 @@
         <br><br><br><br><br><br>
         </div>
     </div>
-    <div class="modal-footer">
+    <div class="modal-footer" style="background: none;">
         <a class="waves-effect waves-green btn" onclick="manage_db()">Confirm</a>
     </div>
 </div>
