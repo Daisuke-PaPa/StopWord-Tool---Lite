@@ -5,7 +5,13 @@
       {"from":"$ANY_ ့","to":"‌$ANY့"},
       {"from":"$ANY_ ွ","to":"‌$ANYွ"},
       {"from":"_ $ANY_ ်","to":"‌$ANY်"},
- 
+      {"from":"$ANY_ ‌ယ့်","to":"$ANYယ့်"},
+      {"from":"$ANY_ ါ","to":"$ANYါ"},
+      {"from":"$ANYိ_ ူ‌င်","to":"$ANYိူ‌င်"},
+      {"from":"$ANYိ_ ူး_","to":"$ANYိူး"},
+      {"from":"ေ‌$ANYျာ်","to":"‌‌$ANYျော်"},
+      {"from":"$ANY_ ံး_","to":"$ANYံး_"},
+      {"from":"_ $ANY်","to":"$ANY်"},
     ]
 
     function applyRules(rules, output) {
@@ -14,22 +20,22 @@
           let regexPattern = rule.from
               .replace(/\$ANY/g, "([^_\\s]+)") // Match sequences without underscores or spaces
               .replace(/_/g, "_"); // Ensure underscores are matched literally
-  
+      
           let regex = new RegExp(regexPattern, "g");
-  
+      
           output = output.replace(regex, (...matches) => {
               let replacement = rule.to;
               let capturedIndex = 1;
-  
+      
               // Replace "$ANY" in "to" with captured values
               replacement = replacement.replace(/\$ANY/g, () => matches[capturedIndex++] || "");
-  
+      
               return replacement;
           });
       });
-  
+      
       return output;
-  }
+    }
   
 
   
