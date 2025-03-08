@@ -8,26 +8,33 @@ async function fixSpacing() {
     let content = textarea.value;
     let previousContent;
 
-    // Continue replacing until no more changes occur
     do {
-        previousContent = content; // Store the current content
+        previousContent = content;
 
-        // Step 1: Replace " _ " with "_ " globally
+        // Replace " _ " with "_ "
         content = content.replace(/ _ /g, "_ ");
 
-        // Step 2: Replace double spaces with a single space globally
-        content = content.replace(/  /g, " ");
+        // Replace multiple spaces with a single space
+        content = content.replace(/ {2,}/g, " ");
 
-        // Step 3: Replace "__ " with "_ " globally
+        // Replace double underscores followed by a space with a single underscore followed by a space
         content = content.replace(/__ /g, "_ ");
 
-        // Step 4: Equalize multiple newlines into a single newline
-        content = content.replace(/(\r\n|\n|\r)+/g, '\n');
+        // Remove invisible characters following an underscore (if another underscore follows later, that underscore remains)
+        content = content.replace(/(_)[\s\u200B\u200C\u200D]+/g, "$1");
+        // Remove invisible characters preceding an underscore
+        content = content.replace(/[\s\u200B\u200C\u200D]+(_)/g, "$1");
 
-    } while (previousContent !== content); // Continue until no more changes
+        // Replace multiple newlines (of any type) with a single newline
+        content = content.replace(/(\r\n|\n|\r)+/g, "\n");
+
+        content = content.replaceAll("_", "_ ");
+
+    } while (previousContent !== content);
     manualValueChange(content);
     await hideWords();
 }
+
 
 
 
