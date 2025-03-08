@@ -104,7 +104,7 @@
 </head>
 <body style="background-color: #262626;">
     <nav>
-        <div class="nav-wrapper">
+        <div class="nav-wrapper" onclick="unwrapMatches();document.getElementById('text_search').value='';document.getElementById('search-navigation').classList.add('tn_hidden');document.getElementById('search-info').innerHTML = '';">
             <div class="brand-logo center" onclick="checkPayday()" style="cursor: pointer;">
                 <span style="font-size: 15px;" id="date"></span>
                 <img src="images/logo_mini.png">
@@ -146,6 +146,7 @@
                     <input id="text_search" type="text" class="validate" style="color: white;">
                     <label for="text_search">Search Document</label>
                 </div>
+                <div id="search-info" style="color: white;"></div>
                 <div id="search-navigation" class="tn_hidden">
                     <div class="section" style="color: white;">
                         <div class="row valign-wrapper">

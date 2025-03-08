@@ -6,8 +6,11 @@ document.addEventListener("DOMContentLoaded", function(){
     currentFileName = JSON.parse(localStorage.getItem("work_file_name")) || "";
     if (document.getElementById('main-text').value !== "")
     {
+        hideWords();
         showStatusNotification('Save file loaded');
         text_content_memory = document.getElementById('main-text').value;
+        console.log("Global Hidden Indexes:", globalHiddenIndexes);
+
     }
 });
 

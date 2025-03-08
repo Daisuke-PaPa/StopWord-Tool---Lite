@@ -1,7 +1,7 @@
 async function fixSpacing() {
     const textarea = document.getElementById('main-text');
     if (!textarea) {
-        showStatusNotification("Textarea not found!", false); // Hide close button
+        showStatusNotification("Textarea not found!", false);
         return;
     }
 
@@ -11,22 +11,24 @@ async function fixSpacing() {
     // Continue replacing until no more changes occur
     do {
         previousContent = content; // Store the current content
+
         // Step 1: Replace " _ " with "_ " globally
         content = content.replace(/ _ /g, "_ ");
 
-        // Step 2: Replace " _ " with "_ " again (duplicate step)
-        content = content.replace(/ _ /g, "_ ");
-
-        // Step 3: Replace double spaces with a single space globally
+        // Step 2: Replace double spaces with a single space globally
         content = content.replace(/  /g, " ");
 
-        // Step 4: Replace "__ " with "_ " globally
+        // Step 3: Replace "__ " with "_ " globally
         content = content.replace(/__ /g, "_ ");
+
+        // Step 4: Equalize multiple newlines into a single newline
+        content = content.replace(/(\r\n|\n|\r)+/g, '\n');
 
     } while (previousContent !== content); // Continue until no more changes
     manualValueChange(content);
     await hideWords();
 }
+
 
 //--------------------------------------
 // Function to apply the fix segments

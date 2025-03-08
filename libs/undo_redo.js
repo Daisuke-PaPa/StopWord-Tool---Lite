@@ -1,116 +1,130 @@
 // Declare the necessary variables globally
 let history = [];
 let currentHistoryIndex = -1; // Tracks the current position in the history array.
-const maxHistory = 30; // Max history size to keep.
+const maxHistory = 30;         // Maximum history size to keep.
 let lastSavedText = '';
-let textArea = null; // Initially set textArea to null
-let isSaving = false; // Prevents re-entrant execution
+let textArea = null;           // Reference to the textarea element
+let isSaving = false;          // Prevent re-entrant saves
 
 // Function to initialize the text area and event listeners
 function initTextArea() {
-    textArea = document.getElementById('main-text'); // Define textArea when the DOM is fully loaded
+    textArea = document.getElementById('main-text');
+    if (!textArea) return;
+    
+    lastSavedText = textArea.value;
+    let cursorAdjustment = 0; // Tracks adjustment needed for cursor position
+  
+    // Capture keydown events to adjust cursor position logic
+    textArea.addEventListener('keydown', (e) => {
+      if (e.key === 'Backspace') {
+        cursorAdjustment = 1; // Increase cursor position by 1 on backspace
+      } else {
+        cursorAdjustment = -1; // Decrease cursor position by 1 on other keys
+      }
+    });
+  
+    // Listen for input events and record history
+    textArea.addEventListener('input', () => {
+      if (isSaving) return;
+      isSaving = true;
+  
+      const currentValue = textArea.value;
+      let cursorPosition = textArea.selectionStart + cursorAdjustment; // Apply adjustment
+  
+      if (currentValue !== lastSavedText) {
+        // Truncate future history if not at the end
+        if (currentHistoryIndex < history.length - 1) {
+          history = history.slice(0, currentHistoryIndex + 1);
+        }
+        saveState(currentValue, cursorPosition);
+        lastSavedText = currentValue;
+      }
+  
+      // Reset cursor adjustment after applying it
+      cursorAdjustment = 0;
+      isSaving = false;
+    });
+  
+    // Listen for undo (Ctrl+Z) and redo (Ctrl+Y) key combinations
+    document.addEventListener('keydown', (e) => {
+      if (e.ctrlKey || e.metaKey) {
+        if (e.code === 'KeyZ') {
+          e.preventDefault();
+          undo();
+        }
+        if (e.code === 'KeyY') {
+          e.preventDefault();
+          redo();
+        }
+      }
+    });
+  
+    // Save the initial state
+    saveState(textArea.value, textArea.selectionStart);
+  }
+  
 
-    if (textArea) {  // Ensure textArea exists before using it
-        lastSavedText = textArea.value;
-
-        // Listen for input to update history (only when necessary)
-        textArea.addEventListener('input', function () {
-            if (isSaving) return; // Prevent function from running if a save is in progress
-            isSaving = true;
-
-            const currentValue = textArea.value;
-            const cursorPosition = textArea.selectionStart; // Get cursor position
-
-            if (currentValue !== lastSavedText) {
-                // If we're not at the end of the history, remove future history steps
-                if (currentHistoryIndex < history.length - 1) {
-                    history = history.slice(0, currentHistoryIndex + 1);
-                }
-
-                // Save the current state
-                saveState(currentValue, cursorPosition);
-                lastSavedText = currentValue;
-            }
-
-            isSaving = false;
-        });
-
-        document.addEventListener('keydown', function (e) {
-            if (e.ctrlKey || e.metaKey) {
-                const isTextAreaFocused = document.activeElement === textArea;
-                const isInputOrTextAreaFocused = document.activeElement.tagName === 'TEXTAREA' || document.activeElement.tagName === 'INPUT';
-        
-                if (e.code === 'KeyZ') {
-                    e.preventDefault();
-                    if (isTextAreaFocused || (!isInputOrTextAreaFocused && !isTextAreaFocused)) {
-                        undo();
-                    }
-                }
-        
-                if (e.code === 'KeyY') {
-                    e.preventDefault();
-                    if (isTextAreaFocused || (!isInputOrTextAreaFocused && !isTextAreaFocused)) {
-                        redo();
-                    }
-                }
-            }
-        });        
-
-        // Initial save state (when the page loads)
-        saveState(textArea.value, textArea.selectionStart);
-    }
-}
-
-// Save the current state of the textarea to history, including cursor position
 function saveState(currentValue, cursorPosition) {
     if (history.length >= maxHistory) {
-        history.shift(); // Remove the oldest entry if max limit is reached
+      history.shift(); // Remove the oldest entry if at max
     }
+  
+    // Ensure the last history entry (if exists) has the same cursor position
+    if (history.length > 0) {
+      history[history.length - 1].cursor = cursorPosition;
+    }
+  
     history.push({ text: currentValue, cursor: cursorPosition });
     currentHistoryIndex = history.length - 1;
-}
+  }
+  
 
-// Undo functionality
+// Undo: restore the previous state (if available)
 function undo() {
-    if (currentHistoryIndex > 0) {
-        currentHistoryIndex--;
-        restoreState(history[currentHistoryIndex]);
-    }
+  if (currentHistoryIndex > 0) {
+    currentHistoryIndex--;
+    restoreState(history[currentHistoryIndex]);
+  }
 }
 
-// Redo functionality
+// Redo: restore the next state (if available)
 function redo() {
-    if (currentHistoryIndex < history.length - 1) {
-        currentHistoryIndex++;
-        restoreState(history[currentHistoryIndex]);
+  if (currentHistoryIndex < history.length - 1) {
+    currentHistoryIndex++;
+    if(history.length == currentHistoryIndex+1){
+      restoreState(history[currentHistoryIndex],true);
     }
+    else{restoreState(history[currentHistoryIndex]);}
+  }
 }
 
-// Restore a saved state, including cursor position
-function restoreState(state) {
-    if (textArea) {
-        textArea.value = state.text;
-        setCursorPosition(state.cursor);
+// Restore a saved state
+function restoreState(state,last_redo=false) {
+  if (textArea) {
+    textArea.value = state.text;
+    lastSavedText = state.text; // Sync lastSavedText to the restored text
+
+    textArea.selectionEnd = textArea.selectionStart = state.cursor;
+    textArea.blur();
+    textArea.focus();
+    if(last_redo){
+      textArea.setSelectionRange(state.cursor+1, state.cursor+1);
+    }
+    else{
+      textArea.setSelectionRange(state.cursor, state.cursor);
     }
 }
-
-// Set the cursor position in the text area
-function setCursorPosition(index) {
-    if (textArea) {
-        textArea.selectionStart = textArea.selectionEnd = index;
-        textArea.blur();
-        textArea.focus();
-    }
-}
-
-// Manually trigger a change when the value of the textarea is altered programmatically
-function manualValueChange(newValue) {
-    if (textArea) {
-        textArea.value = newValue;
-        const lastCursor = history.length ? history[history.length - 1].cursor : 0; // Use last known cursor position
-        saveState(newValue, lastCursor);
-    }
 }
 
 // Initialize the text area when the page loads
 document.addEventListener('DOMContentLoaded', initTextArea);
+
+// Manually trigger a change when the value of the textarea is altered programmatically
+function manualValueChange(newValue) {
+  if (textArea) {
+      textArea.value = newValue;
+      const lastCursor = history.length ? history[history.length - 1].cursor : 0; // Use last known cursor position
+      saveState(newValue, lastCursor);
+      hideWords();
+  }
+}
