@@ -24,8 +24,6 @@ async function fixSpacing() {
         // Step 4: Equalize multiple newlines into a single newline
         content = content.replace(/(\r\n|\n|\r)+/g, '\n');
 
-        content = content.replaceAll("_ ​​_", "_");
-
     } while (previousContent !== content); // Continue until no more changes
     manualValueChange(content);
     await hideWords();
