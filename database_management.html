@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stop Words Tool - Lite</title>
+    <link rel="icon" type="image/x-icon" href="images/favicon.png">
+    <link href="css/materialize.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/icon.css">
+</head>
+<body style="background-color: #262626;color: white;" class="container">
+    <h3 class="center-align">Database Management</h3><div class="divider"></div>
+    <table class="highlight centered responsive-table" contenteditable="true">
+        <thead>
+          <tr>
+              <th>No.</th>
+              <th>Hide List</th>
+              <th>CSW</th>
+              <th>Segment Fix</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr>
+            <td class="db_index">0</td>
+            <td class="hide_list">Dog</td>
+            <td class="csw_list">is</td>
+            <td class="fix_segment">Dog_d | Dog d_</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <script src="libs/ini_database.js"></script>
+      <script src="libs/db_table.js"></script>
+</body>
+</html>
