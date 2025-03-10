@@ -43,4 +43,4 @@ async function populateTable() {
 }
 
 // Call populateTable to update table
-populateTable();
+//populateTable();
