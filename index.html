@@ -54,7 +54,10 @@
     overflow: hidden; /* Prevents weird overflows */
     text-overflow: ellipsis; /* Adds "..." if the text overflows */
 }
-
+    #main-text {
+        caret-color: rgb(0, 255, 76); /* Change to any color you like */
+        color: #ffffff;
+      }
 
     .sw_tb_active {
         background-color: rgb(71, 71, 71);
@@ -88,7 +91,7 @@
     .custom-textarea {
         color: white;
         resize: none;
-        background-color: #313131;
+        background-color: #303030;
         border-radius: 0.5%;
         line-height: 36px;
         white-space: pre-wrap;
@@ -100,6 +103,10 @@
         overflow: hidden; /* Hide scrollbars */
         height:100vh;
     }
+
+    * {
+  cursor: url("cursor.png"), auto !important;
+}
     </style>
 </head>
 <body style="background-color: #262626;">
@@ -142,9 +149,16 @@
         <div class="row">
             <div class="col s2">
                 <div class="input-field">
-                    <i class="material-icons prefix" style="color: white;">search</i>
                     <input id="text_search" type="text" class="validate" style="color: white;">
                     <label for="text_search">Search Document</label>
+                      <!-- Switch -->
+                    <div class="switch" style="color: white !important;">
+                        Filtered Search:
+                        <label>
+                        <input type="checkbox" id="filtered_search" checked>
+                        <span class="lever"></span>
+                        </label>
+                    </div>
                 </div>
                 <div id="search-info" style="color: white;"></div>
                 <div id="search-navigation" class="tn_hidden">
@@ -211,7 +225,7 @@
     </ul>
 
     <ul id="word-hide-menu" class="dropdown-content">
-        <li> <a class="modal-trigger" href="#add_hide_list" onclick="document.getElementById('hide_list').value = '';">Hide SW</a></li>
+        <li> <a class="modal-trigger" href="#add_hide_list" onclick="document.getElementById('hide_list').value = '';">Add NSW</a></li>
         <li class="divider"></li>
         <li><a onclick="create_sw_list();checkAndLoadSWList();showStatusNotification('StopWord list reset')" style="font-size: 15px;"><span class="material-icons" style="color: white;font-size: 16px;">restart_alt</span>SW List</a></li>
         <li class="divider"></li>
@@ -318,16 +332,37 @@
     <script>
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', () => {
-            navigator.serviceWorker.register('https://daisuke-papa.github.io/StopWord-Tool---Lite/service-worker.js',{ scope: 'https://daisuke-papa.github.io/StopWord-Tool---Lite/' })
-              .then((registration) => {
-                console.log('Service Worker registered with scope:', registration.scope);
-              })
-              .catch((error) => {
-                console.error('Service Worker registration failed:', error);
-              });
+            navigator.serviceWorker.register('https://daisuke-papa.github.io/StopWord-Tool---Lite/service-worker.js', {
+              scope: 'https://daisuke-papa.github.io/StopWord-Tool---Lite/'
+            })
+            .then((registration) => {
+              console.log('Service Worker registered with scope:', registration.scope);
+      
+              // Check for updates and refresh page if a new service worker is installed
+              registration.onupdatefound = () => {
+                const newWorker = registration.installing;
+                if (newWorker) {
+                  newWorker.onstatechange = () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                      console.log('New service worker installed, refreshing page...');
+                      window.location.reload();
+                    }
+                  };
+                }
+              };
+            })
+            .catch((error) => {
+              console.error('Service Worker registration failed:', error);
+            });
+          });
+      
+          // Ensure service worker updates immediately when the page is reloaded
+          navigator.serviceWorker.addEventListener('controllerchange', () => {
+            console.log('Service worker updated, reloading page...');
+            window.location.reload();
           });
         }
-      </script>
+      </script>      
       
 </body>
 </html>

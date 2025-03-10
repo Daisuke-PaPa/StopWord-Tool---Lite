@@ -212,27 +212,41 @@ function loadSWTextFile() {
     input.click(); // Trigger file selection dialog
 }
 
+
 document.addEventListener("DOMContentLoaded", function () {
     const swListTextbox = document.getElementById("sw_list");
 
-    function handleMouseMove(event, textarea) {
-        let cursorPos = textarea.selectionStart;
-        let lines = textarea.value.split("\n");
+    // Function to handle click and select the nearest line
+    function handleClick(event, textarea) {
+        // Get the position of the click relative to the textarea
+        const clickPos = event.clientY - textarea.getBoundingClientRect().top;
 
+        // Get the line height from the computed styles
+        const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
+
+        // Calculate the line number by dividing the click position by line height
+        const lineNumber = Math.floor(clickPos / lineHeight);
+
+        // Get all the lines from the textarea
+        const lines = textarea.value.split("\n");
+
+        // Calculate the start and end index of the line that should be selected
         let startIndex = 0;
-        for (let i = 0; i < lines.length; i++) {
-            let endIndex = startIndex + lines[i].length;
-
-            if (cursorPos >= startIndex && cursorPos <= endIndex) {
-                textarea.setSelectionRange(startIndex, endIndex);
-                break;
-            }
-
-            startIndex = endIndex + 1;
+        for (let i = 0; i < lineNumber && i < lines.length; i++) {
+            startIndex += lines[i].length + 1; // +1 for the newline character
         }
+
+        // Calculate the end of the line
+        let endIndex = startIndex + lines[lineNumber].length;
+
+        // Select the line by setting the selection range
+        textarea.setSelectionRange(startIndex, endIndex);
     }
 
-    swListTextbox.addEventListener("mousemove", function (event) {
-        handleMouseMove(event, swListTextbox);
+    // Add a click event listener to the textarea to call handleClick
+    swListTextbox.addEventListener("click", function (event) {
+        handleClick(event, swListTextbox);
     });
 });
+
+

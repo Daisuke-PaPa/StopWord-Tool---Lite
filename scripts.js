@@ -209,3 +209,14 @@ setInterval(updateClock, 1000);
 // Initial call to set the clock immediately
 updateClock();
 
+// Event listener for keydown event
+document.getElementById('sw_list').addEventListener('keydown', function(event) {
+  // Check if the textarea is focused and if left or right arrow keys are pressed
+  if (event.key === 'ArrowLeft') {
+      // Call moveSwIndex with -1 for left arrow
+      moveSwIndex(-1);
+  } else if (event.key === 'ArrowRight') {
+      // Call moveSwIndex with 1 for right arrow
+      moveSwIndex(1);
+  }
+});

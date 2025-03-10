@@ -11,7 +11,10 @@
       {"from":"$ANYိ_ ူး_","to":"$ANYိူး"},
       {"from":"ေ‌$ANYျာ်","to":"‌‌$ANYျော်"},
       {"from":"$ANY_ ံး_","to":"$ANYံး_"},
-      //{"from":"_ $ANY်_","to":"$ANY်_"},
+      {"from":"$ANYိ_ $ANY်","to":"$ANYိ$ANY်"},
+      {"from":"$ANY_ ီး_","to":"$ANYီး_"},
+      {"from":"$ANY_ ှ‌","to":"$ANYှ‌"},
+      {"from":"$ANY_ း","to":"$ANYး"},
     ]
 
     function applyRules(rules, output) {

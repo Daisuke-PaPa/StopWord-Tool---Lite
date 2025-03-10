@@ -97,13 +97,20 @@ function wrapEligibleMatches() {
         let matchIndex = match.index;
         updatedText += textContent.substring(lastIndex, matchIndex);
         
-        if (!isInHiddenRanges(matchIndex, searchText.length) &&
-            !hasCswSuffix(textContent, searchText, matchIndex)) {
-            // Wrap eligible match.
+        // only check if checkbox checked
+        const filtered_check = document.getElementById("filtered_search");
+        if (filtered_check.checked){
+            if (!isInHiddenRanges(matchIndex, searchText.length) &&
+                !hasCswSuffix(textContent, searchText, matchIndex)) {
+                // Wrap eligible match.
+                updatedText += "(" + searchText + ")";
+            } else {
+                // Leave ineligible match unchanged.
+                updatedText += textContent.substr(matchIndex, searchText.length);
+            }
+        }
+        else{
             updatedText += "(" + searchText + ")";
-        } else {
-            // Leave ineligible match unchanged.
-            updatedText += textContent.substr(matchIndex, searchText.length);
         }
         lastIndex = matchIndex + searchText.length;
     }

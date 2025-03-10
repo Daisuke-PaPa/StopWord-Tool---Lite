@@ -1,4 +1,4 @@
-const CACHE_NAME = 'stopwords-tool-cache-v3.6'; // update the version to force new caching when assets change
+const CACHE_NAME = 'stopwords-tool-cache-v3.6'; // Update version to force new cache
 const urlsToCache = [
   '/',
   '/StopWord-Tool---Lite/index.html',
@@ -26,32 +26,23 @@ const urlsToCache = [
   '/StopWord-Tool---Lite/libs/text_search.js',
   '/StopWord-Tool---Lite/libs/undo_redo.js',
   '/StopWord-Tool---Lite/libs/zg_to_unicode.js',
-  '/StopWord-Tool---Lite/libs/db_manage.js'
+  '/StopWord-Tool---Lite/libs/db_manage.js',
+  '/StopWord-Tool---Lite/cursor.png',
 ];
 
+// Install event
 self.addEventListener('install', (event) => {
   console.log('Service Worker: Installing...');
-  // Immediately activate the new service worker
-  self.skipWaiting();
+  self.skipWaiting(); // Forces the new SW to activate immediately
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('Service Worker: Caching assets...');
-      return Promise.all(
-        urlsToCache.map((url) =>
-          fetch(url, { cache: 'no-cache' })
-            .then((response) => {
-              if (!response.ok) {
-                throw new Error(`Failed to fetch ${url}`);
-              }
-              return cache.put(url, response.clone());
-            })
-            .catch((error) => console.warn(`Service Worker: Failed to cache ${url}:`, error))
-        )
-      );
+      return cache.addAll(urlsToCache);
     })
   );
 });
 
+// Activate event
 self.addEventListener('activate', (event) => {
   console.log('Service Worker: Activating...');
   event.waitUntil(
@@ -64,23 +55,43 @@ self.addEventListener('activate', (event) => {
           }
         })
       )
-    ).then(() => self.clients.claim())
-  );
-});
-
-self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      if (cachedResponse) {
-        console.log('Service Worker: Returning cached response', event.request.url);
-        return cachedResponse;
-      }
-      return fetch(event.request).catch(() => {
-        // Fallback: for navigation requests (e.g., when offline), serve index.html
-        if (event.request.mode === 'navigate') {
-          return caches.match('/StopWord-Tool---Lite/index.html');
-        }
+    ).then(() => {
+      console.log('Service Worker: Claiming clients...');
+      self.clients.claim();
+      return self.clients.matchAll().then(clients => {
+        clients.forEach(client => client.postMessage({ action: "reload" }));
       });
     })
   );
+});
+
+// Fetch event
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    fetch(event.request)
+      .then((networkResponse) => {
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, networkResponse.clone());
+          return networkResponse;
+        });
+      })
+      .catch(() => caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) {
+          return cachedResponse;
+        }
+        if (event.request.mode === 'navigate') {
+          return caches.match('/StopWord-Tool---Lite/index.html');
+        }
+      }))
+  );
+});
+
+// Listen for messages from the SW and reload if needed
+self.addEventListener('message', (event) => {
+  if (event.data.action === "reload") {
+    console.log('New version available, reloading page...');
+    self.clients.matchAll().then(clients => {
+      clients.forEach(client => client.navigate(client.url));
+    });
+  }
 });
