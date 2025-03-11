@@ -209,9 +209,9 @@
         <li class="divider"></li>
         <li><a onclick="downloadFile()">Download</a></li>
         <li class="divider"></li>
-        <li><a class="modal-trigger" onclick="populateDatabaseList();" href="#database">Database</a></li>
-        <!--<li class="divider"></li>
-        <li><a onclick="deleteSaveFile()">Delete</a></li>-->
+        <li><a class="modal-trigger" onclick="populateDatabaseList();" href="#database">Manage Database</a></li>
+        <li class="divider"></li>
+        <li><a href="database_management.html" target="_blank">Edit Database</a></li>
     </ul>
 
     <ul id="segment-menu" class="dropdown-content">
@@ -225,8 +225,6 @@
     </ul>
 
     <ul id="word-hide-menu" class="dropdown-content">
-        <li> <a class="modal-trigger" href="#add_hide_list" onclick="document.getElementById('hide_list').value = '';">Add NSW</a></li>
-        <li class="divider"></li>
         <li><a onclick="create_sw_list();checkAndLoadSWList();showStatusNotification('StopWord list reset')" style="font-size: 15px;"><span class="material-icons" style="color: white;font-size: 16px;">restart_alt</span>SW List</a></li>
         <li class="divider"></li>
         <li><a onclick="loadSWTextFile()" style="font-size: 15px;"><span class="material-icons" style="color: white;font-size: 16px;">description</span>SW File</a></li>
@@ -235,6 +233,8 @@
     </ul>
 
     <ul id="CSW-menu" class="dropdown-content">
+        <li> <a class="modal-trigger" href="#add_hide_list" onclick="document.getElementById('hide_list').value = '';">Add Hide</a></li>
+        <li class="divider"></li>
         <li> <a class="modal-trigger" href="#add_csw_list" onclick="document.getElementById('hide_list').value = '';">Add CSW</a></li>
         <li class="divider"></li>
         <li> <a onclick="processCSWMatches()">Get CSW List</a></li>
