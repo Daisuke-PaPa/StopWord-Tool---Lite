@@ -1,72 +1,70 @@
-// Get the active database name from localStorage
-let activeDBName2 = localStorage.getItem("active_database");
+async function generateTableRows() {
+  // Get the target database name.
+  const activeDBName = localStorage.getItem("active_database");
+  
+  // Fetch data for each group.
+  // Adjust the function signature as needed (e.g. fetchGroupData might require both parameters).
+  const hideListData = await fetchGroupData(activeDBName, "hide_list");
+  const cswListData  = await fetchGroupData(activeDBName, "csw_list");
+  const fixSegmentData = await fetchGroupData(activeDBName, "fix_segment");
 
-// Function to fetch group data from IndexedDB
-async function fetchGroupData2(groupName) {
-  return new Promise((resolve, reject) => {
-    let dbRequest = indexedDB.open(activeDBName2);
-    
-    dbRequest.onsuccess = function (event) {
-      let db = event.target.result;
-      let transaction = db.transaction([groupName], "readonly");
-      let store = transaction.objectStore(groupName);
-      
-      // Get all data from the group
-      store.getAll().onsuccess = function (event) {
-        console.log(`Data for ${groupName}:`, event.target.result); // Log the data to debug
-        resolve(event.target.result);
-      };
-      
-      store.getAll().onerror = function (event) {
-        reject("Error fetching data: " + event.target.error);
-      };
-    };
+  // For fix_segment, each row will combine two items.
+  const fixRows = Math.ceil(fixSegmentData.length / 2);
+  // Get number of rows for hide_list and csw_list.
+  const hideRows = hideListData.length;
+  const cswRows  = cswListData.length;
+  
+  // Determine the maximum number of rows needed.
+  const maxRows = Math.max(hideRows, cswRows, fixRows);
 
-    dbRequest.onerror = function (event) {
-      reject("Error opening database: " + event.target.error);
-    };
-  });
+  // Get the table body element.
+  const tbody = document.querySelector("table.responsive-table tbody");
+  // Clear any existing rows.
+  tbody.innerHTML = "";
+
+  // Generate rows.
+  for (let i = 0; i < maxRows; i++) {
+      // Create a new table row.
+      const row = document.createElement("tr");
+
+      // Column 1: DB Index (row number)
+      const tdIndex = document.createElement("td");
+      tdIndex.className = "db_index";
+      tdIndex.textContent = i;
+      row.appendChild(tdIndex);
+
+      // Column 2: Hide List group.
+      const tdHide = document.createElement("td");
+      tdHide.className = "hide_list";
+      // If there is an item at index i, show it; otherwise leave blank.
+      tdHide.textContent = hideListData[i] !== undefined ? hideListData[i] : "";
+      row.appendChild(tdHide);
+
+      // Column 3: CSW group.
+      const tdCsw = document.createElement("td");
+      tdCsw.className = "csw_list";
+      tdCsw.textContent = cswListData[i] !== undefined ? cswListData[i] : "";
+      row.appendChild(tdCsw);
+
+      // Column 4: Fix Segment group (2 items per row).
+      const tdFix = document.createElement("td");
+      tdFix.className = "fix_segment";
+      let itemA = fixSegmentData[2 * i];
+      let itemB = fixSegmentData[2 * i + 1];
+      // Only add the separator if both items exist.
+      let fixText = "";
+      if (itemA !== undefined) {
+          fixText = itemA;
+          if (itemB !== undefined) {
+              fixText += " | " + itemB;
+          }
+      }
+      tdFix.textContent = fixText;
+      row.appendChild(tdFix);
+
+      // Append the row to the table body.
+      tbody.appendChild(row);
+  }
 }
 
-async function populateTable() {
-    let tbody = document.querySelector("tbody");
-    tbody.innerHTML = ""; // Clear the table before populating
-
-    let groups = ["hide_list", "csw_list", "fix_segment"];
-    let dataMap = {};
-
-    // Fetch data for all groups
-    for (let group of groups) {
-        dataMap[group] = await fetchGroupData2(group);
-    }
-
-    // Populate table with fetched data
-    for (let group of groups) {
-        let groupData = dataMap[group];
-
-        if (groupData && Array.isArray(groupData)) {
-            groupData.forEach(item => {
-                let row = document.createElement("tr");
-
-                // Adjust this based on the structure of your `item`
-                row.innerHTML = `
-                    <td>${group}</td>
-                    <td>${item || "N/A"}</td>
-                    <td>${item.value || "N/A"}</td>
-                `;
-
-                tbody.appendChild(row);
-            });
-        }
-    }
-}
-
-window.addEventListener("DOMContentLoaded", populateTable);
-
-// Call renderTable function to populate the table
-populateTable();
-
-  
-  
- 
-  
+generateTableRows;
