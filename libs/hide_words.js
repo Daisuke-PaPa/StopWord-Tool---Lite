@@ -1,17 +1,8 @@
 let globalHiddenIndexes = [];
 const textarea = document.getElementById("main-text");
-var lastProcessedText = "";
 var current_text = document.getElementById("main-text").value;
 
 function hideWords(force_reload=false) {
-    var current_text = document.getElementById("main-text").value;
-    if (current_text === lastProcessedText && !force_reload) {
-        console.log("Skipping hideWords because text is unchanged and hidden indexes exist.");
-        return;
-    }
-
-    lastProcessedText = current_text;
-
     return fetchGroupData('hide_list')
         .then(groupData => {
             let editorText = document.getElementById('main-text').value;
