@@ -8,7 +8,7 @@
     <link href="css/materialize.css" rel="stylesheet">
     <link rel="stylesheet" href="css/icon.css">
 </head>
-<body style="background-color: #262626;color: white;" class="container">
+<body style="background-color: #262626;color: white;">
     <h3 class="center-align">Database Management</h3><div class="divider"></div>
     <table class="highlight centered responsive-table" contenteditable="true">
         <thead>
@@ -29,8 +29,25 @@
           </tr>
         </tbody>
       </table>
-
+  <!-- Floating Button -->
+  <button style="
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 15px;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: background-color 0.3s ease;
+  " onclick="updateDatabaseFromTable();">
+    Update Database
+  </button>
       <script src="libs/ini_database.js"></script>
       <script src="libs/db_table.js"></script>
+      
 </body>
+
 </html>

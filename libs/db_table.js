@@ -1,46 +1,72 @@
+// Get the active database name from localStorage
+let activeDBName2 = localStorage.getItem("active_database");
 
+// Function to fetch group data from IndexedDB
+async function fetchGroupData2(groupName) {
+  return new Promise((resolve, reject) => {
+    let dbRequest = indexedDB.open(activeDBName2);
+    
+    dbRequest.onsuccess = function (event) {
+      let db = event.target.result;
+      let transaction = db.transaction([groupName], "readonly");
+      let store = transaction.objectStore(groupName);
+      
+      // Get all data from the group
+      store.getAll().onsuccess = function (event) {
+        console.log(`Data for ${groupName}:`, event.target.result); // Log the data to debug
+        resolve(event.target.result);
+      };
+      
+      store.getAll().onerror = function (event) {
+        reject("Error fetching data: " + event.target.error);
+      };
+    };
 
-// Function to build table rows
+    dbRequest.onerror = function (event) {
+      reject("Error opening database: " + event.target.error);
+    };
+  });
+}
+
 async function populateTable() {
     let tbody = document.querySelector("tbody");
-    tbody.innerHTML = ""; // Clear existing rows
+    tbody.innerHTML = ""; // Clear the table before populating
 
-    let groups = ["db_index", "hide_list", "csw_list", "fix_segment"];
+    let groups = ["hide_list", "csw_list", "fix_segment"];
     let dataMap = {};
 
     // Fetch data for all groups
     for (let group of groups) {
-        dataMap[group] = await fetchGroupData(group);
+        dataMap[group] = await fetchGroupData2(group);
     }
 
-    let maxRows = Math.max(
-        dataMap["hide_list"].length,
-        dataMap["csw_list"].length,
-        dataMap["fix_segment"].length
-    );
+    // Populate table with fetched data
+    for (let group of groups) {
+        let groupData = dataMap[group];
 
-    for (let i = 0; i < maxRows; i++) {
-        let row = document.createElement("tr");
+        if (groupData && Array.isArray(groupData)) {
+            groupData.forEach(item => {
+                let row = document.createElement("tr");
 
-        // Create table cells dynamically
-        groups.forEach(group => {
-            let cell = document.createElement("td");
-            cell.className = group;
+                // Adjust this based on the structure of your `item`
+                row.innerHTML = `
+                    <td>${group}</td>
+                    <td>${item || "N/A"}</td>
+                    <td>${item.value || "N/A"}</td>
+                `;
 
-            if (group === "fix_segment") {
-                let itemA = dataMap[group][i * 2] || "";
-                let itemB = dataMap[group][i * 2 + 1] || "";
-                cell.textContent = `${itemA} | ${itemB}`; // Format fix_segment
-            } else {
-                cell.textContent = dataMap[group][i] || ""; // Regular cases
-            }
-
-            row.appendChild(cell);
-        });
-
-        tbody.appendChild(row); // Append row to table
+                tbody.appendChild(row);
+            });
+        }
     }
 }
 
-// Call populateTable to update table
-//populateTable();
+window.addEventListener("DOMContentLoaded", populateTable);
+
+// Call renderTable function to populate the table
+populateTable();
+
+  
+  
+ 
+  

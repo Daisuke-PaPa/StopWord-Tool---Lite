@@ -130,7 +130,7 @@ function searchAndSelectText(searchDirection, advance = true) {
     const textContent = textBox.value;
     if (!searchText) return;
     
-    // Build a regex that finds wrapped occurrences.
+    // Build regex to find wrapped occurrences.
     const wrappedRegex = new RegExp('\\(' + escapeRegExp(searchText) + '\\)', "g");
     let matches = [...textContent.matchAll(wrappedRegex)];
     
@@ -151,46 +151,50 @@ function searchAndSelectText(searchDirection, advance = true) {
         )
     }));
     
-    if (current_search_index === -1) {
-        // First search: select the first match.
-        currentMatchOrder = 1;
-    } else if (advance) {
-        // If advancing, update currentMatchOrder based on direction.
+    let newIndex;
+    // Find the current match in the updated list.
+    let foundOrder = cachedValidMatches.findIndex(match => match.matchIndex === current_search_index);
+    
+    if (foundOrder === -1) {
+        // Current match was removed.
         if (searchDirection === 'right') {
-            currentMatchOrder++;
-            if (currentMatchOrder > cachedValidMatches.length) {
-                currentMatchOrder = 1;
-            }
+            // Look for the first match with an index greater than current_search_index.
+            let candidateIndex = cachedValidMatches.findIndex(match => match.matchIndex > current_search_index);
+            newIndex = candidateIndex === -1 ? 0 : candidateIndex;
         } else if (searchDirection === 'left') {
-            currentMatchOrder--;
-            if (currentMatchOrder < 1) {
-                currentMatchOrder = cachedValidMatches.length;
+            // Look for the last match with an index less than current_search_index.
+            let candidateIndex = -1;
+            for (let i = cachedValidMatches.length - 1; i >= 0; i--) {
+                if (cachedValidMatches[i].matchIndex < current_search_index) {
+                    candidateIndex = i;
+                    break;
+                }
             }
+            newIndex = candidateIndex === -1 ? cachedValidMatches.length - 1 : candidateIndex;
         }
+        // In deletion scenario, do not apply an extra advance.
     } else {
-        // Not advancing: try to re‑select the current match.
-        let foundOrder = cachedValidMatches.findIndex(match => match.matchIndex === current_search_index);
-        if (foundOrder === -1) {
-            // If the current match is no longer valid, pick the next available.
-            let candidate = cachedValidMatches.find(match => match.matchIndex > current_search_index);
-            if (candidate) {
-                currentMatchOrder = cachedValidMatches.indexOf(candidate) + 1;
-            } else {
-                currentMatchOrder = 1;
+        // If current match still exists, start from its index.
+        newIndex = foundOrder;
+        if (advance) {
+            if (searchDirection === 'right') {
+                newIndex = (newIndex + 1) % cachedValidMatches.length;
+            } else if (searchDirection === 'left') {
+                newIndex = (newIndex - 1 + cachedValidMatches.length) % cachedValidMatches.length;
             }
-            current_search_index = cachedValidMatches[currentMatchOrder - 1].matchIndex;
-        } else {
-            currentMatchOrder = foundOrder + 1;
         }
     }
     
-    let foundIndex = cachedValidMatches[currentMatchOrder - 1].matchIndex;
-    jumptomatch(foundIndex);
-    current_search_index = foundIndex;
+    // Update global values and jump to the new match.
+    currentMatchOrder = newIndex + 1;
+    current_search_index = cachedValidMatches[newIndex].matchIndex;
+    jumptomatch(current_search_index);
+    
     document.getElementById('search-navigation').classList.remove('tn_hidden');
     document.getElementById('search-info').innerHTML = "";
     countAndDisplayMatches();
 }
+
 
 /**
  * Recalculates the wrapped matches and updates the navigation display.

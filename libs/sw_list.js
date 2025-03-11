@@ -10,7 +10,7 @@ document.addEventListener("DOMContentLoaded", function(){
         showStatusNotification('Save file loaded');
         text_content_memory = document.getElementById('main-text').value;
         console.log("Global Hidden Indexes:", globalHiddenIndexes);
-
+        if(currentFileName!==""){document.title = currentFileName;}
     }
 });
 
@@ -215,6 +215,7 @@ function loadSWTextFile() {
 
 document.addEventListener("DOMContentLoaded", function () {
     const swListTextbox = document.getElementById("sw_list");
+    const cswListTextbox = document.getElementById("csw_list_textbox");
 
     // Function to handle click and select the nearest line
     function handleClick(event, textarea) {
@@ -236,17 +237,27 @@ document.addEventListener("DOMContentLoaded", function () {
             startIndex += lines[i].length + 1; // +1 for the newline character
         }
 
-        // Calculate the end of the line
-        let endIndex = startIndex + lines[lineNumber].length;
+        // Calculate the end of the line (if it exists)
+        let endIndex = startIndex + (lines[lineNumber] ? lines[lineNumber].length : 0);
 
         // Select the line by setting the selection range
         textarea.setSelectionRange(startIndex, endIndex);
     }
 
-    // Add a click event listener to the textarea to call handleClick
-    swListTextbox.addEventListener("click", function (event) {
-        handleClick(event, swListTextbox);
-    });
+    // Attach the click event to the sw_list textbox, if it exists
+    if (swListTextbox) {
+        swListTextbox.addEventListener("click", function (event) {
+            handleClick(event, swListTextbox);
+        });
+    }
+
+    // Attach the click event to the csw_list_textbox, if it exists
+    if (cswListTextbox) {
+        cswListTextbox.addEventListener("click", function (event) {
+            handleClick(event, cswListTextbox);
+        });
+    }
 });
+
 
 

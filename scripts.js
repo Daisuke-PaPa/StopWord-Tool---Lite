@@ -110,6 +110,7 @@ function openFile() {
                 };
                 reader.readAsText(file);
             }
+            if(currentFileName!==""){document.title = currentFileName;}
         }
     });
     
