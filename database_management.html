@@ -7,9 +7,10 @@
     <link rel="icon" type="image/x-icon" href="images/favicon.png">
     <link href="css/materialize.css" rel="stylesheet">
     <link rel="stylesheet" href="css/icon.css">
+    <style>.holder {position: fixed;bottom: 20px;right: 20px;}</style>
 </head>
 <body style="background-color: #262626;color: white;">
-    <h3 class="center-align">Database Management</h3><div class="divider"></div>
+    <h3 class="center-align" id="header-h3">Database Management</h3><div class="divider"></div>
     <table class="highlight centered responsive-table" contenteditable="true">
         <thead>
           <tr contenteditable="false">
@@ -23,31 +24,25 @@
         <tbody>
           <tr>
             <td class="db_index">0</td>
-            <td class="hide_list">Dog</td>
-            <td class="csw_list">is</td>
-            <td class="fix_segment">Dog_d | Dog d_</td>
+            <td class="hide_list">-</td>
+            <td class="csw_list">-</td>
+            <td class="fix_segment">-</td>
           </tr>
         </tbody>
       </table>
   <!-- Floating Button -->
-  <button style="
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background-color: #4CAF50;
-    color: white;
-    border: none;
-    padding: 15px;
-    font-size: 20px;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    transition: background-color 0.3s ease;
-  " onclick="updateDatabaseFromTable();">
+  <div class="holder">
+  <button onclick="initDB();generateTableRows();" class="btn orange">
+    Refresh Table
+  </button>
+  <button onclick="updateGroupWithClass('hide_list')" class="btn red">
     Update Database
   </button>
+  </div>
       <script src="libs/ini_database.js"></script>
       <script src="libs/db_table.js"></script>
-      
+      <script src="libs/materialize.js"></script>
+      <script src="libs/notify_box.js"></script>
 </body>
 
 </html>
