@@ -1,12 +1,12 @@
 // Run the function when the page is fully loaded
 document.addEventListener("DOMContentLoaded", checkAndLoadSWList);
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded",async function(){
     document.getElementById('main-text').value = JSON.parse(localStorage.getItem("work_file")) || "";
     currentFileName = JSON.parse(localStorage.getItem("work_file_name")) || "";
     if (document.getElementById('main-text').value !== "")
     {
-        hideWords();
+        await hideWords();
         showStatusNotification('Save file loaded');
         text_content_memory = document.getElementById('main-text').value;
         console.log("Global Hidden Indexes:", globalHiddenIndexes);
