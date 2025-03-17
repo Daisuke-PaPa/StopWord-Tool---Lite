@@ -4,7 +4,7 @@
       {"from":"$ANYော့_ ်_","to":"‌$ANYော့်_"},
       {"from":"$ANY_ ့","to":"‌$ANY့"},
       {"from":"$ANY_ ွ","to":"‌$ANYွ"},
-      {"from":"_ $ANY_ ်","to":"‌$ANY်"},
+      {"from":"$ANY_ ်","to":"‌$ANY်"},
       {"from":"$ANY_ ‌ယ့်","to":"$ANYယ့်"},
       {"from":"$ANY_ ါ","to":"$ANYါ"},
       {"from":"$ANYိ_ ူ‌င်","to":"$ANYိူ‌င်"},
@@ -14,7 +14,16 @@
       {"from":"$ANYိ_ $ANY်","to":"$ANYိ$ANY်"},
       {"from":"$ANY_ ီး_","to":"$ANYီး_"},
       {"from":"$ANY_ ှ‌","to":"$ANYှ‌"},
-      {"from":"$ANY_ း","to":"$ANYး"},
+      {"from":"_ ေ_ $ANYး_","to":"_ $ANYေး_"},
+      {"from":"_ ေ_ $ANY_ း_","to":"_ $ANYေး_"},
+      {"from":"$ANY_ း_","to":"$ANYး_"},
+      {"from":"_ $ANY_ င့်","to":"_ $ANYင့်"},
+      {"from":"_ ချ်_","to":"ချ်_"},
+      {"from":"_ ေ_ $ANY_ ","to":"_ $ANYေ_ "},
+      {"from":"$ANYို_ $ANY့်_","to":"$ANYို$ANY့်_"},
+      {"from":"$ANYိ_ ူ_ င်","to":"$ANYိူင်"},
+      {"from":"$ANY_ စ်","to":"$ANYစ်"},
+      {"from":"$ANYွ_ $ANY်","to":"$ANYွ$ANY်"},
     ]
 
     function applyRules(rules, output) {

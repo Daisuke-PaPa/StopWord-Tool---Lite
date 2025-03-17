@@ -111,7 +111,7 @@
 </head>
 <body style="background-color: #262626;">
     <nav>
-        <div class="nav-wrapper" onclick="unwrapMatches();document.getElementById('text_search').value='';document.getElementById('search-navigation').classList.add('tn_hidden');document.getElementById('search-info').innerHTML = '';">
+        <div class="nav-wrapper" onclick="unwrapMatches();document.getElementById('text_search').value='';document.getElementById('search-navigation').classList.add('tn_hidden');document.getElementById('search-info').innerHTML = '';unwrapMatches();">
             <div class="brand-logo center" onclick="checkPayday()" style="cursor: pointer;">
                 <span style="font-size: 15px;" id="date"></span>
                 <img src="images/logo_mini.png">
@@ -217,7 +217,7 @@
     <ul id="segment-menu" class="dropdown-content">
         <li><a onclick="deleteSpecialCharacters()">Segmentation</a></li>
         <li class="divider"></li>
-        <li><a onclick="fixSpacing();applyFixSegments();">Fix Segment</a></li>
+        <li><a onclick="fixSpacing();showStatusNotification('Fixing Segments...', false);applyFixSegments();">Fix Segment</a></li>
         <li class="divider"></li> 
         <li> <a class="modal-trigger" href="#add_segment_modal" onclick="document.getElementById('wrong_segment').value = '';document.getElementById('right_segment').value = '';">Add Segment</a></li>
         <li class="divider"></li>

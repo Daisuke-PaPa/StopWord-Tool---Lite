@@ -39,43 +39,40 @@ async function fixSpacing() {
 
 
 
-//--------------------------------------
-// Function to apply the fix segments
 function applyFixSegments() {
-    showStatusNotification('Fixing Segments...', false);  // Initial status message
-    const mainText = document.getElementById('main-text').value; // Get the main text from the textbox
-    let updatedText = mainText; // Start with the original text
+    const mainTextElement = document.getElementById('main-text');
+    const originalText = mainTextElement.value; // Get the current text from the textbox
 
-    updatedText =  applyRules(rules, mainText);
+    // First, apply any predefined rules
+    let updatedText = applyRules(rules, originalText);
 
     // Fetch all values of the "fix_segment" group from the database
     fetchGroupData('fix_segment').then(groupData => {
-        const totalSegments = groupData.length; // Total number of segments
-        let currentSegment = 0; // Start counting from the first segment
-
-        // Loop through each segment in the groupData
+        // Loop through each segment and perform replacements
         groupData.forEach(segment => {
-            const wrongSegment = segment.wrong_segment; // The "wrong" part to find
-            const rightSegment = segment.right_segment; // The "right" part to replace with
-
-            // Use normal replace to perform the find-and-replace on the main text
-            //updatedText = string.replace(new RegExp("\\b"+wrongSegment+"\\b"), rightSegment);
-            updatedText = updatedText.replaceAll(wrongSegment, rightSegment); // Replace all occurrences
-
-            // Update progress information
-            currentSegment++;
+            const wrongSegment = segment.wrong_segment;
+            const rightSegment = segment.right_segment;
+            updatedText = updatedText.replaceAll(wrongSegment, rightSegment);
         });
 
-        // Update the text area with the modified text
-        document.getElementById('main-text').value = updatedText;
-        fixSpacing();
-        showStatusNotification('Done fixing!', true);  // Final notification
-
+        // Check if any changes were made during this iteration
+        if (updatedText !== originalText) {
+            // If changes occurred, update the textbox and repeat the process
+            mainTextElement.value = updatedText;
+            fixSpacing();
+            applyFixSegments();  // Recursively call the function
+        } else {
+            // No further changes: finalize the process
+            mainTextElement.value = updatedText;
+            fixSpacing();
+            showStatusNotification('Done fixing!', true);
+        }
     }).catch(error => {
         console.error("Error retrieving group data:", error);
-        showStatusNotification('Error occurred while fixing segments.', true); // Error notification
+        showStatusNotification('Error occurred while fixing segments.', true);
     });
 }
+
 
 // removing undderscores
 function removeUnderscores() {
