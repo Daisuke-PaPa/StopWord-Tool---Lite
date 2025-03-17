@@ -24,6 +24,10 @@
       {"from":"$ANYိ_ ူ_ င်","to":"$ANYိူင်"},
       {"from":"$ANY_ စ်","to":"$ANYစ်"},
       {"from":"$ANYွ_ $ANY်","to":"$ANYွ$ANY်"},
+      {"from":"$ANY_ ည့်","to":"$ANYည့်"},
+      {"from":"$ANY_ န့်","to":"$ANYန့်"},
+      {"from":"$ANY_ ယ့်","to":"$ANYယ့်"},
+      {"from":"$ANYီ_ $ANY်","to":"$ANYီ$ANY်"},
     ]
 
     function applyRules(rules, output) {

@@ -40,8 +40,6 @@ function create_sw_list() {
     };
     
     localStorage.setItem("sw_list", JSON.stringify(sw_list));
-    localStorage.setItem("work_file", JSON.stringify(""));
-    localStorage.setItem("work_file_name", JSON.stringify(""));
     console.log("sw_list has been initialized and saved to local storage.");
 }
 
