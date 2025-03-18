@@ -38,19 +38,29 @@ self.addEventListener('install', (event) => {
 
 // Activate event - Cleanup old caches if necessary
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim()); // Activate new worker immediately
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key); // Delete old cache versions
+          }
+        })
+      );
+    })
+  );
+  self.clients.claim();
 });
 
-// Fetch event - Try online first, fallback to cache
+// Fetch event - Always fetch new files online and update the cache
 self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetch(event.request)
       .then((response) => {
-        const clonedResponse = response.clone();
-        caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, clonedResponse);
+        return caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, response.clone()); // Update cache
+          return response;
         });
-        return response;
       })
       .catch(() => caches.match(event.request)) // Serve from cache if offline
   );
