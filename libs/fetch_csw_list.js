@@ -95,114 +95,73 @@ const cswSuffixList = ['က့်','င့်','စ့်','ည့်','မ့�
 function csw_delete() {
   // Fetch the value from the 'csw_list_textbox' textbox
   let cswList = document.getElementById('csw_list_textbox').value;
-  let skipped = 0;
-  let deleted = 0;
-
-  // Split the value by line breaks to create an array of items
   let cswArray = cswList.split('\n');
   console.log("Array of words to search for:", cswArray);
 
   // Get the content from the 'main-text' textbox
   let mainText = document.getElementById('main-text').value;
 
-  console.log("Original text in 'main-text':", mainText);
+  let deleted = 0;
+  let skipped = 0;
 
-  // Start looping through each item in the array
-  let lastIndex = 0;  // Start searching from index 0
-  
-  for (let i = 0; i < cswArray.length; i++) {
-    let searchValue = cswArray[i].trim();
-    
+  // Process each search term without updating the DOM immediately
+  cswArray.forEach(term => {
+    let searchValue = term.trim();
     if (searchValue === "") {
-      console.log(`Skipping empty search term at index ${i}`);
-      continue; // Skip empty search terms
+      console.log(`Skipping empty search term`);
+      return;
     }
-
     console.log(`Searching for "${searchValue}" in the main text`);
-
-    // Continue searching until the end of the content for the current word
+    
+    let lastIndex = 0;
     let foundIndex = -1;
     while (lastIndex < mainText.length) {
-      // Find the search value in the text, starting from the last index
       foundIndex = mainText.indexOf(searchValue, lastIndex);
       console.log(`Searching from index ${lastIndex}: Found "${searchValue}" at index ${foundIndex}`);
-
+      
       if (foundIndex !== -1) {
         // Check if the match is inside any bracketed region
-        let isHidden = false;
-        for (let j = 0; j < globalHiddenIndexes.length; j++) {
-          let bracket = globalHiddenIndexes[j];
-          if (foundIndex >= bracket.start && foundIndex <= bracket.end) {
-            isHidden = true;
-            break;
-          }
-        }
-
+        let isHidden = globalHiddenIndexes.some(bracket => foundIndex >= bracket.start && foundIndex <= bracket.end);
+        
         if (isHidden) {
-          console.log(`Skipping match "${searchValue}" at index ${foundIndex} because it's inside brackets`);
+          console.log(`Skipping "${searchValue}" at index ${foundIndex} (inside brackets)`);
           lastIndex = foundIndex + searchValue.length;
           skipped++;
-          continue;  // Skip this match
+          continue;
         }
-
+        
         // Check if the word has a CSW suffix before replacing it
         if (hasCswSuffix(mainText, searchValue, foundIndex)) {
-          console.log(`Skipping match "${searchValue}" at index ${foundIndex} due to CSW suffix`);
+          console.log(`Skipping "${searchValue}" at index ${foundIndex} due to CSW suffix`);
           lastIndex = foundIndex + searchValue.length;
           skipped++;
-          continue; // Don't delete if it has a CSW suffix
+          continue;
         }
-
-        // Replace the target with '#' placeholders to avoid disturbing the globalHiddenIndexes
-        console.log(`Replacing match "${searchValue}" with '#' at index ${foundIndex}`);
+        
+        console.log(`Replacing "${searchValue}" at index ${foundIndex}`);
         let placeholder = '#'.repeat(searchValue.length);
         mainText = mainText.substring(0, foundIndex) + placeholder + mainText.substring(foundIndex + searchValue.length);
-        
-        // After replacement, continue searching from the last found index
         lastIndex = foundIndex + placeholder.length;
         deleted++;
       } else {
-        // If no more matches are found, break out of the inner loop and move to the next word in the list
-        console.log(`No more matches found for "${searchValue}" from index ${lastIndex}. Moving to the next word.`);
+        console.log(`No more matches found for "${searchValue}" from index ${lastIndex}`);
         break;
       }
     }
-    // Reset the lastIndex for the next search term in the array, if any
-    lastIndex = 0; 
-    document.getElementById('main-text').value = mainText;
-  }
-
-  // Collect skipped words before deleting '#'
-  let skippedWords = cswArray.filter((word) => mainText.includes(word.trim()));
-
-  // Check if skipped words are inside hidden ranges or have CSW suffixes
-  skippedWords = skippedWords.filter((word) => {
-    let trimmedWord = word.trim();
-    let foundIndex = mainText.indexOf(trimmedWord);
-    
-    if (foundIndex !== -1) {
-      for (let j = 0; j < globalHiddenIndexes.length; j++) {
-        let bracket = globalHiddenIndexes[j];
-        if (foundIndex >= bracket.start && foundIndex <= bracket.end) {
-          skipped--;  // Adjust skipped count
-          return false; // Remove from skippedWords list
-        }
-      }
-    }
-    return true; // Keep it if not inside hidden range or suffix check
   });
 
-  // Now remove '#' from mainText
+  // Post-processing: Remove placeholder '#' characters
   mainText = mainText.replace(/#/g, '');
 
-  // Update the CSW text box with skipped words
+  // Optionally update csw_list_textbox with any remaining skipped words
+  let skippedWords = cswArray.filter(word => mainText.includes(word.trim()));
   document.getElementById('csw_list_textbox').value = skippedWords.join('\n');
-
-  // Adjust skipped count based on actual remaining skipped words
   skipped = skippedWords.length;
 
+  // Update the text area only once after all processing is complete
   document.getElementById('main-text').value = mainText;
-  fixSpacing();
+  //fixSpacing();
   showStatusNotification(`Deleted ${deleted} words${skipped !== 0 ? ` and skipped ${skipped} words` : ''}`);
 }
+
 
