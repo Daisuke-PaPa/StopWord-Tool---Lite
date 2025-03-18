@@ -53,7 +53,7 @@ async function generateTableRows() {
         tbody.appendChild(row);
         
     }
-    showStatusNotification("ရာမဲတဲ အိုနီးချန်");
+    showStatusNotification("Table Loaded");
   }
 
   async function getTDValues() {
@@ -75,7 +75,7 @@ async function generateTableRows() {
 }
 
 async function saveToIndexedDB(data) {
-    showStatusNotification("အားအား");
+    showStatusNotification("Saving...");
     let request = indexedDB.open(activeDBName);
 
     request.onupgradeneeded = function(event) {
@@ -118,7 +118,7 @@ async function saveToIndexedDB(data) {
 
         transaction.oncomplete = function() {
             console.log("Data successfully saved to IndexedDB");
-            showStatusNotification("ပြီးပါပြီ");
+            showStatusNotification("Database Updated");
         };
     };
 
