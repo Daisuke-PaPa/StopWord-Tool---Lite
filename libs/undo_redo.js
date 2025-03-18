@@ -79,6 +79,9 @@ function restoreState(state) {
     textArea.value = state.text;
     lastSavedText = state.text; // Sync lastSavedText to the restored text
     // Simply restore the saved cursor position.
+    textArea.selectionEnd = textArea.selectionStart = state.cursor;
+    textArea.blur();
+    textArea.focus();
     textArea.setSelectionRange(state.cursor, state.cursor);
   }
 }
