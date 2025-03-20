@@ -1,48 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stop Words Tool - Lite</title>
-    <link rel="icon" type="image/x-icon" href="images/favicon.png">
-    <link href="css/materialize.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/icon.css">
-    <style>.holder {position: fixed;bottom: 20px;right: 20px;}</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Stop Words Tool - Lite</title>
+  <link rel="icon" type="image/x-icon" href="images/favicon.png" />
+  <link href="css/materialize.css" rel="stylesheet" />
+  <link rel="stylesheet" href="css/icon.css" />
+  <style>
+    .holder {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+    }
+
+    /* Sticky header styles for the table thead */
+    thead.pushpin2 {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    /* Default state when not pushpinned */
+    thead.pushpin2.not-stuck {
+      background-color: transparent;
+      color: white;
+    }
+
+    /* When pushpinned (sticky state) */
+    thead.pushpin2.stuck {
+      background-color: white !important;
+      color: black !important;
+      box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
-<body style="background-color: #262626;color: white;">
-    <h3 class="center-align" id="header-h3">Database Management</h3><div class="divider"></div>
-    <table class="highlight centered responsive-table" contenteditable="true">
-        <thead>
-          <tr contenteditable="false">
-              <th>No.</th>
-              <th>Hide List</th>
-              <th>CSW</th>
-              <th>Segment Fix</th>
-          </tr>
-        </thead>
+<body style="background-color: #262626; color: white;">
+  <h3 class="center-align" id="header-h3">Database Management</h3>
+  <div class="divider"></div>
+  <table class="highlight centered responsive-table" contenteditable="true">
+    <!-- Added id and pushpin2 classes to thead -->
+    <thead id="table-header" class="pushpin2 not-stuck">
+      <tr contenteditable="false">
+        <th>No.</th>
+        <th>Hide List</th>
+        <th>CSW</th>
+        <th>Segment Fix</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="db_index">0</td>
+        <td class="hide_list">-</td>
+        <td class="csw_list">-</td>
+        <td class="fix_segment">-</td>
+      </tr>
+    </tbody>
+  </table>
 
-        <tbody>
-          <tr>
-            <td class="db_index">0</td>
-            <td class="hide_list">-</td>
-            <td class="csw_list">-</td>
-            <td class="fix_segment">-</td>
-          </tr>
-        </tbody>
-      </table>
-  <!-- Floating Button -->
+  <!-- Floating Buttons -->
   <div class="holder">
-  <button onclick="initDB();generateTableRows();" class="btn orange">
-    Refresh Table
-  </button>
-  <button onclick="getTDValues();" class="btn red">
-    Update Database
-  </button>
+    <button onclick="initDB();generateTableRows();" class="btn orange">
+      Refresh Table
+    </button>
+    <button onclick="getTDValues();" class="btn red">
+      Update Database
+    </button>
   </div>
-      <script src="libs/ini_database.js"></script>
-      <script src="libs/db_table.js"></script>
-      <script src="libs/materialize.js"></script>
-      <script src="libs/notify_box.js"></script>
-</body>
 
+  <!-- Scripts -->
+  <script src="libs/ini_database.js"></script>
+  <script src="libs/db_table.js"></script>
+  <script src="libs/materialize.js"></script>
+  <script src="libs/notify_box.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      const header = document.getElementById("table-header");
+      const table = document.querySelector("table");
+
+      if (!header || !table) return;
+
+      window.addEventListener("scroll", function () {
+        const tableTop = table.getBoundingClientRect().top;
+        // When the table top goes above the viewport, header is stuck
+        if (tableTop < 0) {
+          header.classList.add("stuck");
+          header.classList.remove("not-stuck");
+        } else {
+          header.classList.remove("stuck");
+          header.classList.add("not-stuck");
+        }
+      });
+    });
+  </script>
+</body>
 </html>
