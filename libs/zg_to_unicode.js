@@ -27,7 +27,7 @@
       {"from":"$ANY_ ည့်","to":"$ANYည့်"},
       {"from":"$ANY_ န့်","to":"$ANYန့်"},
       {"from":"$ANY_ ယ့်","to":"$ANYယ့်"},
-      {"from":"$ANYီ_ $ANY်","to":"$ANYီ$ANY်"},
+      //{"from":"$ANYီ_ $ANY်","to":"$ANYီ$ANY်"},
       {"from":"$ANY_ ရ့်","to":"$ANYရ့်"},
       {"from":"$ANYြ_ ှင့်","to":"$ANYြှင့်"},
       {"from":"$ANY_ ီး","to":"$ANYီး"},
