@@ -57,8 +57,11 @@ function downloadFile() {
       text = text.replace(/  /g, ' '); // Replace double spaces with a single space
   } while (text !== previousText); // Continue until no changes are made
 
-  // Remove curly braces {} and square brackets []
-  text = text.replace(/[{}[\]]/g, '');
+  // Remove common special characters using the provided regex
+  text = text.replace(
+    /[\\~!@#$%^&*()_\-+=`|{}\[\]:";'<>.,?\/…၊။•↪⭐■▪━༻༺“”‘’–—]|[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, 
+    ''
+  );
 
   // Save the text content as a .txt file with the same name as the opened file
   const blob = new Blob([text], { type: 'text/plain' });
@@ -68,6 +71,7 @@ function downloadFile() {
   link.click();
   showStatusNotification("File downloaded");
 }
+
 
 
 // Open File Function (Handle both .docx and .txt)

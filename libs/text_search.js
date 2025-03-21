@@ -303,6 +303,8 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchBox = document.getElementById("text_search");
     const searchNavigation = document.getElementById('search-navigation');
     searchBox.addEventListener("input", function () {
+        // Remove all occurrences of ( and )
+        searchBox.value = searchBox.value.replace(/[()]/g, "");
         if (searchBox.value === "") {
             searchNavigation.classList.add('tn_hidden');
             let textContent = document.getElementById('main-text').value;

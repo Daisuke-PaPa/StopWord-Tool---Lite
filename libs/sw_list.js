@@ -217,8 +217,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Function to handle click and select the nearest line
     function handleClick(event, textarea) {
-        // Get the position of the click relative to the textarea
-        const clickPos = event.clientY - textarea.getBoundingClientRect().top;
+        // Get the position of the click relative to the textarea and add scroll offset
+        const clickPos = event.clientY - textarea.getBoundingClientRect().top + textarea.scrollTop;
 
         // Get the line height from the computed styles
         const lineHeight = parseInt(window.getComputedStyle(textarea).lineHeight, 10);
@@ -229,13 +229,13 @@ document.addEventListener("DOMContentLoaded", function () {
         // Get all the lines from the textarea
         const lines = textarea.value.split("\n");
 
-        // Calculate the start and end index of the line that should be selected
+        // Calculate the start index of the line that should be selected
         let startIndex = 0;
         for (let i = 0; i < lineNumber && i < lines.length; i++) {
             startIndex += lines[i].length + 1; // +1 for the newline character
         }
 
-        // Calculate the end of the line (if it exists)
+        // Calculate the end index of the line (if it exists)
         let endIndex = startIndex + (lines[lineNumber] ? lines[lineNumber].length : 0);
 
         // Select the line by setting the selection range

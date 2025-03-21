@@ -29,6 +29,19 @@
       {"from":"$ANY_ ယ့်","to":"$ANYယ့်"},
       {"from":"$ANYီ_ $ANY်","to":"$ANYီ$ANY်"},
       {"from":"$ANY_ ရ့်","to":"$ANYရ့်"},
+      {"from":"$ANYြ_ ှင့်","to":"$ANYြှင့်"},
+      {"from":"$ANY_ ီး","to":"$ANYီး"},
+      {"from":"$ANY်_ $ANY်","to":"$ANY်$ANY်"},
+      {"from":"$ANY_ $ANY်ျ","to":"$ANY$ANY်ျ"},
+      {"from":"_ $ANY်","to":"$ANY်"},
+      {"from":"$ANY_ ျု","to":"$ANYျု"},
+      {"from":"$ANY_ ျ","to":"$ANYျ"},
+      {"from":"$ANYြ_ ှီး","to":"$ANYြှီး"},
+      {"from":"$ANY_ ိ","to":"$ANYိ"},
+      {"from":"$ANY_ ူး","to":"$ANYူး"},
+      {"from":"$ANY_ ံ","to":"$ANYံ"},
+      {"from":"$ANYျ_ ု","to":"$ANYျု"},
+      {"from":"$ANY_ ှီ","to":"$ANYှီ"},
     ]
 
     function applyRules(rules, output) {
