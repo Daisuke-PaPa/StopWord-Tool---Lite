@@ -339,8 +339,8 @@
       navigator.serviceWorker.register('/StopWord-Tool---Lite/sw.js')
         .then(registration => {
           console.log('Service Worker registered with scope:', registration.scope);
-          // Optionally notify the service worker that DOM is loaded.
           if (navigator.serviceWorker.controller) {
+            // Notify SW that DOM is loaded
             navigator.serviceWorker.controller.postMessage('DOM_LOADED');
           }
         })
@@ -349,10 +349,10 @@
         });
     }
 
-    // Select the element with the "online" class
+    // Select the online indicator element
     const onlineIndicator = document.querySelector('a.online');
 
-    // Function to update the indicator based on status received from the service worker
+    // Update the indicator based on SW status
     function updateStatusFromSW(status) {
       if (status === 'ONLINE') {
         onlineIndicator.innerHTML = '<i class="material-icons" style="color:rgb(0, 255, 0);">wifi</i>';
@@ -368,12 +368,12 @@
       }
     });
 
-    // Function to ask the service worker to check connectivity
+    // Request the service worker to check connectivity
     function checkOnlineStatus() {
       if (navigator.serviceWorker.controller) {
         navigator.serviceWorker.controller.postMessage('CHECK_ONLINE_STATUS');
       } else {
-        // If no service worker controller is available, consider it offline.
+        // If no controller, assume offline
         updateStatusFromSW('OFFLINE');
       }
     }
@@ -381,10 +381,9 @@
     // Check connectivity on page load
     window.addEventListener('load', checkOnlineStatus);
 
-    // Optionally, re-check connectivity periodically (e.g., every minute)
+    // Optionally, re-check periodically (e.g., every minute)
     // setInterval(checkOnlineStatus, 60000);
   </script>
-
-
+  
 </body>
 </html>

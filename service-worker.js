@@ -26,11 +26,11 @@ const CACHE_FILES = [
   `${BASE_URL}/scripts.js`
 ];
 
-// Utility function to fetch with a timeout (default 30 seconds)
-function fetchWithTimeout(request, timeout = 30000) {
+// Updated fetchWithTimeout: accepts a URL and optional fetch options.
+function fetchWithTimeout(url, timeout = 30000, options = {}) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('Network timeout')), timeout);
-    fetch(request)
+    fetch(url, options)
       .then(response => {
         clearTimeout(timer);
         resolve(response);
@@ -105,7 +105,7 @@ self.addEventListener('message', (event) => {
     // Refresh all cache files after DOM is loaded.
     caches.open(CACHE_NAME).then(cache => {
       CACHE_FILES.forEach(url => {
-        fetchWithTimeout(url, 60000)
+        fetchWithTimeout(url, 30000)
           .then(response => {
             if (response && response.status === 200 && response.type === 'basic') {
               cache.put(url, response);
@@ -117,8 +117,8 @@ self.addEventListener('message', (event) => {
       });
     });
   } else if (event.data === 'CHECK_ONLINE_STATUS') {
-    // Try fetching index.html with a 30-second timeout.
-    fetchWithTimeout(`${BASE_URL}/index.html`, 30000)
+    // IMPORTANT: Bypass cache by using { cache: 'no-store' }
+    fetchWithTimeout(`${BASE_URL}/index.html`, 30000, { cache: 'no-store' })
       .then(response => {
         // If fetch succeeds, report online status.
         event.source.postMessage({ status: 'ONLINE' });
