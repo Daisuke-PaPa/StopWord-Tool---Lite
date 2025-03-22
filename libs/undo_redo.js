@@ -74,7 +74,7 @@ function saveState(currentValue, cursorPosition) {
 }
 
 // Restore a saved state exactly as saved
-function restoreState(state) {
+function restoreState(state,msg) {
   if (textArea) {
     textArea.value = state.text;
     lastSavedText = state.text; // Sync lastSavedText to the restored text
@@ -83,6 +83,8 @@ function restoreState(state) {
     textArea.blur();
     textArea.focus();
     textArea.setSelectionRange(state.cursor, state.cursor);
+    if(msg=="redo"){showStatusNotification("ရှေ့ဆက်ဖို့အားထုတ်မှ ပြန်လည်ကာသတိရမိ")};
+    if(msg=="undo"){showStatusNotification("နောက်ဆုတ်ဖို့ကြိုးစားရင်းရှေ့တိုးမိ")};
   }
 }
 
@@ -90,7 +92,7 @@ function restoreState(state) {
 function undo() {
   if (currentHistoryIndex > 0) {
     currentHistoryIndex--;
-    restoreState(history[currentHistoryIndex]);
+    restoreState(history[currentHistoryIndex],"undo");
   }
 }
 
@@ -98,7 +100,7 @@ function undo() {
 function redo() {
   if (currentHistoryIndex < history.length - 1) {
     currentHistoryIndex++;
-    restoreState(history[currentHistoryIndex]);
+    restoreState(history[currentHistoryIndex],"redo");
   }
 }
 
