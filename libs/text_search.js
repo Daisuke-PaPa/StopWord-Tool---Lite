@@ -75,7 +75,7 @@ function unwrapMatches() {
     const textBox = document.getElementById("main-text");
     let textContent = textBox.value;
     textContent = textContent.replace(/[()]/g, '');
-    manualValueChange(textContent);
+    textBox.value = textContent;
 }
 
 /**
