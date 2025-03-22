@@ -116,7 +116,7 @@ function wrapEligibleMatches() {
     }
     updatedText += textContent.substring(lastIndex);
     manualValueChange(updatedText);
-    //hideWords();
+    hideWords();
 }
 
 /**
