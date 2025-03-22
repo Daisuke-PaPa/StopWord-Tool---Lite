@@ -30,6 +30,8 @@
       {"from":"$ANY_ ရ့်","to":"$ANYရ့်"},
       {"from":"$ANYြ_ ှင့်","to":"$ANYြှင့်"},
       {"from":"$ANY_ ီး","to":"$ANYီး"},
+      {"from":"$ANY_ ီ","to":"$ANYီ"},
+      {"from":"$ANY_ ဲ့_","to":"$ANYဲ့_"},
       //{"from":"$ANY_ $ANY်ျ","to":"$ANY$ANY်ျ"},
       {"from":"$ANY_ ျု","to":"$ANYျု"},
       {"from":"$ANY_ ျ","to":"$ANYျ"},

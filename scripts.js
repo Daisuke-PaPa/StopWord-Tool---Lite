@@ -225,3 +225,13 @@ document.getElementById('sw_list').addEventListener('keydown', function(event) {
       moveSwIndex(1);
   }
 });
+
+document.addEventListener("DOMContentLoaded", function () {
+  const swListTextbox = document.getElementById("sw_list");
+
+  swListTextbox.addEventListener("keydown", function(event) {
+      if (event.key === "Backspace") {
+          saveFile();
+      }
+  });
+});

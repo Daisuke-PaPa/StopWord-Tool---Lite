@@ -1,5 +1,5 @@
 async function add_csw_list() {
-    fixSpacing();
+    //fixSpacing();
     var text = document.getElementById('main-text').value;
     const cswList = document.getElementById('csw_list_input').value.trim();
 
@@ -31,8 +31,8 @@ async function add_csw_list() {
         });
 
         await Promise.all(promises); // Wait for all segments to be added
-        manualValueChange(text);
-        await hideWords();
+        //manualValueChange(text);
+        //await hideWords();
 
         // --- Begin repopulating csw_list_textbox ---
         let cswTextbox = document.getElementById('csw_list_textbox');

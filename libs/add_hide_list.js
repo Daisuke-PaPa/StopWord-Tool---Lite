@@ -1,5 +1,5 @@
 async function add_hide_list() {
-    fixSpacing();
+    //fixSpacing();
     var text = document.getElementById('main-text').value;
     const hidelist = document.getElementById('hide_list').value.trim();
 

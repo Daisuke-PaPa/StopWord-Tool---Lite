@@ -3,7 +3,7 @@ let globalCSWMatches = [];     // We'll update this below
 // This function processes the CSW list and updates the csw_list_textbox.
 async function processCSWMatches() {
   // Optionally, fix spacing first if needed.
-  fixSpacing();
+  await fixSpacing();
 
   // Get the editor text.
   let editorText = document.getElementById('main-text').value;
@@ -92,7 +92,8 @@ const cswPrefixList = ['‌ေ','က'];
 const cswSuffixList = ['က့်','င့်','စ့်','ည့်','မ့်','န့်','‌ေ','‌ည့်', 'က်', 'ခ်', 'ဂ်', 'ဃ်', 'င်', 'စ်', 'ဆ်', 'ဇ်', 'ဈ်', 'ဉ်', 'ည်', 'ဋ်', 'ဌ်', 'ဍ်', 'ဎ်', 'ဏ်', 'တ်', 'ထ်', 'ဒ်', 'ဓ်', 'န်', 'ပ်', 'ဖ်', 'ဗ်', 'ဘ်', 'မ်', 'ယ်', 'ရ်', 'လ်', 'ဝ်', 'ဟ်', 'သ်', 'ဟ်', 'ဠ်', 'အ်' , 'ဿ်', 'ာ', 'ါ', 'ိ', 'ီ', 'ု', 'ူ', 'ဲ', 'ံ', '့', 'း', '်', 'ျ', 'ွ', 'ှ', 'ြ','ြာ်']; 
 
 
-function csw_delete() {
+async function csw_delete() {
+  
   // Fetch the value from the 'csw_list_textbox' textbox
   let cswList = document.getElementById('csw_list_textbox').value;
   let cswArray = cswList.split('\n');
@@ -160,7 +161,7 @@ function csw_delete() {
 
   // Update the text area only once after all processing is complete
   document.getElementById('main-text').value = mainText;
-  //fixSpacing();
+  await fixSpacing();
   showStatusNotification(`Deleted ${deleted} words${skipped !== 0 ? ` and skipped ${skipped} words` : ''}`);
 }
 

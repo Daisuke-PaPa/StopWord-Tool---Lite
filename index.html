@@ -335,6 +335,23 @@ if ('serviceWorker' in navigator) {
     .then(() => console.log('Service Worker Registered'))
     .catch((error) => console.error('Service Worker Registration Failed:', error));
 }
+
+document.addEventListener("DOMContentLoaded", function() {
+  if (navigator.onLine) {
+    // Check if a service worker is controlling the page
+    if (navigator.serviceWorker && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.controller.postMessage("DOM_LOADED");
+      console.log("DOM_LOADED message sent to service worker");
+    } else {
+      console.warn("Service worker not controlling this page yet.");
+    }
+  } else {
+    console.log("Offline: Message not sent.");
+  }
+});
+
 </script>
+
+
 </body>
 </html>

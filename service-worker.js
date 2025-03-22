@@ -1,5 +1,5 @@
-const CACHE_NAME = 'dynamic-cache'; // Keeps a single dynamic cache
-const BASE_URL = '/StopWord-Tool---Lite'; // Base path for GitHub Pages
+const CACHE_NAME = 'dynamic-cache-v2'; // Use a versioned cache name
+const BASE_URL = '/StopWord-Tool---Lite';
 
 const CACHE_FILES = [
   `${BASE_URL}/index.html`,
@@ -26,24 +26,40 @@ const CACHE_FILES = [
   `${BASE_URL}/scripts.js`
 ];
 
-// Install event - Cache the core files
+// Utility function to fetch with a timeout (60 seconds)
+function fetchWithTimeout(request, timeout = 60000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Network timeout')), timeout);
+    fetch(request)
+      .then(response => {
+        clearTimeout(timer);
+        resolve(response);
+      })
+      .catch(err => {
+        clearTimeout(timer);
+        reject(err);
+      });
+  });
+}
+
+// Install event - Cache core files
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(CACHE_FILES);
-    })
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(CACHE_FILES))
+      .catch(error => console.error('Error during installation:', error))
   );
   self.skipWaiting();
 });
 
-// Activate event - Cleanup old caches if necessary
+// Activate event - Delete old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
+    caches.keys().then(keys => {
       return Promise.all(
-        keys.map((key) => {
+        keys.map(key => {
           if (key !== CACHE_NAME) {
-            return caches.delete(key); // Delete old cache versions
+            return caches.delete(key);
           }
         })
       );
@@ -52,16 +68,55 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - Always fetch new files online and update the cache
+// Fetch event - Use a network-first strategy with a 60-second timeout
 self.addEventListener('fetch', (event) => {
+  // Only handle GET requests
+  if (event.request.method !== 'GET') return;
+
   event.respondWith(
-    fetch(event.request)
-      .then((response) => {
-        return caches.open(CACHE_NAME).then((cache) => {
-          cache.put(event.request, response.clone()); // Update cache
-          return response;
+    fetchWithTimeout(event.request, 60000)
+      .then(response => {
+        // Only cache valid responses (status 200 and a basic type)
+        if (response && response.status === 200 && response.type === 'basic') {
+          const responseClone = response.clone();
+          caches.open(CACHE_NAME)
+            .then(cache => cache.put(event.request, responseClone));
+        }
+        return response;
+      })
+      .catch(() => {
+        // Fallback to cache if network fails or times out
+        return caches.match(event.request).then(cachedResponse => {
+          if (cachedResponse) {
+            return cachedResponse;
+          }
+          // Optionally, for navigation requests fallback to index.html
+          if (event.request.mode === 'navigate') {
+            return caches.match(`${BASE_URL}/index.html`);
+          }
         });
       })
-      .catch(() => caches.match(event.request)) // Serve from cache if offline
   );
+});
+
+// Listen for messages from the page (e.g., after DOM is fully loaded)
+// The client can send { data: "DOM_LOADED" } if online to force cache refresh.
+self.addEventListener('message', (event) => {
+  if (event.data === 'DOM_LOADED') {
+    // Optionally check if online here if you prefer,
+    // or let the fetchWithTimeout fail naturally.
+    caches.open(CACHE_NAME).then(cache => {
+      CACHE_FILES.forEach(url => {
+        fetchWithTimeout(url, 60000)
+          .then(response => {
+            if (response && response.status === 200 && response.type === 'basic') {
+              cache.put(url, response);
+            }
+          })
+          .catch(err => {
+            console.error(`Failed to refresh ${url}:`, err);
+          });
+      });
+    });
+  }
 });
