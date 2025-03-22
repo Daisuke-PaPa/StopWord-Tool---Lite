@@ -116,7 +116,8 @@ function wrapEligibleMatches() {
         lastIndex = matchIndex + searchText.length;
     }
     updatedText += textContent.substring(lastIndex);
-    manualValueChange(updatedText);
+    //manualValueChange(updatedText);
+    document.getElementById("main-text").value = updatedText;
     hideWords();
 }
 
