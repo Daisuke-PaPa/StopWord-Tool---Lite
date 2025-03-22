@@ -69,13 +69,14 @@ function isInHiddenRanges(matchIndex, matchLength) {
  * Remove any previous wrapping by replacing every occurrence of
  * "(" + searchText + ")" with searchText.
  */ 
-function unwrapMatches() {
+async function unwrapMatches() {
     const searchText = document.getElementById("text_search").value;
     //if (!searchText) return;
     const textBox = document.getElementById("main-text");
     let textContent = textBox.value;
     textContent = textContent.replace(/[()]/g, '');
     textBox.value = textContent;
+    await hideWords();
 }
 
 /**
