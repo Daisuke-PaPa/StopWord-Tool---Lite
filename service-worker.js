@@ -26,7 +26,7 @@ const CACHE_FILES = [
   `${BASE_URL}/scripts.js`
 ];
 
-// Updated fetchWithTimeout: accepts a URL and optional fetch options.
+// A simple fetch with timeout helper.
 function fetchWithTimeout(url, timeout = 30000, options = {}) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('Network timeout')), timeout);
@@ -42,55 +42,42 @@ function fetchWithTimeout(url, timeout = 30000, options = {}) {
   });
 }
 
-// Install event - Cache core files
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => cache.addAll(CACHE_FILES))
-      .catch(error => console.error('Error during installation:', error))
+      .catch(err => console.error('Install error:', err))
   );
   self.skipWaiting();
 });
 
-// Activate event - Delete old caches
 self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.keys().then(keys => {
-      return Promise.all(
-        keys.map(key => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
-        })
-      );
-    })
+    caches.keys().then(keys => Promise.all(
+      keys.map(key => {
+        if (key !== CACHE_NAME) return caches.delete(key);
+      })
+    ))
   );
   self.clients.claim();
 });
 
-// Fetch event - Use a network-first strategy with a 60-second timeout
+// Use a network-first strategy for normal fetches.
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
     fetchWithTimeout(event.request, 60000)
       .then(response => {
-        // Only cache valid responses (status 200 and a basic type)
         if (response && response.status === 200 && response.type === 'basic') {
-          const responseClone = response.clone();
-          caches.open(CACHE_NAME)
-            .then(cache => cache.put(event.request, responseClone));
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
         return response;
       })
       .catch(() => {
-        // Fallback to cache if network fails or times out
-        return caches.match(event.request).then(cachedResponse => {
-          if (cachedResponse) {
-            return cachedResponse;
-          }
-          // Optionally, for navigation requests fallback to index.html
+        return caches.match(event.request).then(cached => {
+          if (cached) return cached;
           if (event.request.mode === 'navigate') {
             return caches.match(`${BASE_URL}/index.html`);
           }
@@ -99,32 +86,18 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// Listen for messages from the page
+// When the page asks, do a simple check: try to fetch index.html without using cache.
+// If that fails, assume the SW loaded from cache.
 self.addEventListener('message', (event) => {
-  if (event.data === 'DOM_LOADED') {
-    // Refresh all cache files after DOM is loaded.
-    caches.open(CACHE_NAME).then(cache => {
-      CACHE_FILES.forEach(url => {
-        fetchWithTimeout(url, 30000)
-          .then(response => {
-            if (response && response.status === 200 && response.type === 'basic') {
-              cache.put(url, response);
-            }
-          })
-          .catch(err => {
-            console.error(`Failed to refresh ${url}:`, err);
-          });
-      });
-    });
-  } else if (event.data === 'CHECK_ONLINE_STATUS') {
-    // IMPORTANT: Bypass cache by using { cache: 'no-store' }
+  if (event.data === 'CHECK_ONLINE_STATUS') {
+    // Force a network request (no cache) to determine if network is really available.
     fetchWithTimeout(`${BASE_URL}/index.html`, 30000, { cache: 'no-store' })
-      .then(response => {
-        // If fetch succeeds, report online status.
+      .then(() => {
+        // Network fetch worked → we're online.
         event.source.postMessage({ status: 'ONLINE' });
       })
-      .catch(err => {
-        // If fetch times out or fails, report offline status.
+      .catch(() => {
+        // Network fetch failed → we're using cache → offline.
         event.source.postMessage({ status: 'OFFLINE' });
       });
   }

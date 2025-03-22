@@ -332,58 +332,49 @@
     <script src="scripts.js"></script>
     <script src="service-worker.js"></script>
 
-  <!-- Client-side JavaScript -->
-  <script>
-    // Register the service worker
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/StopWord-Tool---Lite/sw.js')
-        .then(registration => {
-          console.log('Service Worker registered with scope:', registration.scope);
-          if (navigator.serviceWorker.controller) {
-            // Notify SW that DOM is loaded
-            navigator.serviceWorker.controller.postMessage('DOM_LOADED');
+    <script>
+        // Register the service worker.
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.register('/StopWord-Tool---Lite/sw.js')
+            .then(reg => {
+              console.log('SW registered:', reg.scope);
+            })
+            .catch(err => console.error('SW registration failed:', err));
+        }
+    
+        // Get the online indicator element.
+        const onlineIndicator = document.querySelector('a.online');
+    
+        // Update the icon based on status.
+        function updateStatus(status) {
+          if (status === 'ONLINE') {
+            onlineIndicator.innerHTML = '<i class="material-icons" style="color:rgb(0,255,0);">wifi</i>';
+          } else {
+            onlineIndicator.innerHTML = '<i class="material-icons" style="color:rgb(236,181,63);">wifi_off</i>';
           }
-        })
-        .catch(error => {
-          console.error('Service Worker registration failed:', error);
+        }
+    
+        // Listen for messages from the service worker.
+        navigator.serviceWorker.addEventListener('message', function(event) {
+          if (event.data && event.data.status) {
+            updateStatus(event.data.status);
+          }
         });
-    }
-
-    // Select the online indicator element
-    const onlineIndicator = document.querySelector('a.online');
-
-    // Update the indicator based on SW status
-    function updateStatusFromSW(status) {
-      if (status === 'ONLINE') {
-        onlineIndicator.innerHTML = '<i class="material-icons" style="color:rgb(0, 255, 0);">wifi</i>';
-      } else {
-        onlineIndicator.innerHTML = '<i class="material-icons" style="color:rgb(236, 181, 63);">wifi_off</i>';
-      }
-    }
-
-    // Listen for messages from the service worker
-    navigator.serviceWorker.addEventListener('message', function(event) {
-      if (event.data && event.data.status) {
-        updateStatusFromSW(event.data.status);
-      }
-    });
-
-    // Request the service worker to check connectivity
-    function checkOnlineStatus() {
-      if (navigator.serviceWorker.controller) {
-        navigator.serviceWorker.controller.postMessage('CHECK_ONLINE_STATUS');
-      } else {
-        // If no controller, assume offline
-        updateStatusFromSW('OFFLINE');
-      }
-    }
-
-    // Check connectivity on page load
-    window.addEventListener('load', checkOnlineStatus);
-
-    // Optionally, re-check periodically (e.g., every minute)
-    // setInterval(checkOnlineStatus, 60000);
-  </script>
-  
+    
+        // Request the service worker to check connectivity.
+        function checkOnlineStatus() {
+          if (navigator.serviceWorker.controller) {
+            navigator.serviceWorker.controller.postMessage('CHECK_ONLINE_STATUS');
+          } else {
+            updateStatus('OFFLINE');
+          }
+        }
+    
+        // Run the check on page load.
+        window.addEventListener('load', checkOnlineStatus);
+    
+        // Optionally, re-check periodically:
+        // setInterval(checkOnlineStatus, 60000);
+      </script>
 </body>
 </html>
