@@ -26,8 +26,8 @@ const CACHE_FILES = [
   `${BASE_URL}/scripts.js`
 ];
 
-// Utility function to fetch with a timeout (60 seconds)
-function fetchWithTimeout(request, timeout = 60000) {
+// Utility function to fetch with a timeout (30 seconds)
+function fetchWithTimeout(request, timeout = 30000) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('Network timeout')), timeout);
     fetch(request)
