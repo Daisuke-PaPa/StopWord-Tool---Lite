@@ -103,13 +103,25 @@ self.addEventListener('message', (event) => {
           // Report ONLINE status.
           event.source.postMessage({ status: 'ONLINE' });
         } else {
-          // If the server returns a bad response, fall back to the cache.
-          event.source.postMessage({ status: 'OFFLINE' });
+          // If the server returns a bad response, try to fall back to cache.
+          caches.match(`${BASE_URL}/index.html`).then(cached => {
+            if (cached) {
+              event.source.postMessage({ status: 'OFFLINE', cache: 'fallback' });
+            } else {
+              event.source.postMessage({ status: 'OFFLINE' });
+            }
+          });
         }
       })
       .catch(() => {
-        // Fetch failed (could be no internet or server error) → offline.
-        event.source.postMessage({ status: 'OFFLINE' });
+        // On network failure (including timeout), try to use the cached version.
+        caches.match(`${BASE_URL}/index.html`).then(cached => {
+          if (cached) {
+            event.source.postMessage({ status: 'OFFLINE', cache: 'fallback' });
+          } else {
+            event.source.postMessage({ status: 'OFFLINE' });
+          }
+        });
       });
   }
 });
