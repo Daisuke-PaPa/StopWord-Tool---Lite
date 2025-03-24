@@ -3,6 +3,10 @@ let currentMatchOrder = 1;         // 1-indexed order of the current wrapped mat
 let cachedValidMatches = [];         // Cached array of wrapped matches.
 let previousSearchText = "";         // Store previous search text
 
+let previous_bracketed_text = "";
+let previous_hide_index = [];
+let previous_bracket_search = "";
+
 function toggleReplaceAllMenu() {
     document.getElementById("replace-all-menu").classList.toggle("tn_hidden");
 }
@@ -26,7 +30,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('searchtext').value = currentSearchText;
         document.getElementById('search-info').innerHTML = "Searching...";
 
-        // If the search text has changed, reset the search state.
+        // If the search text has changed, reset the search state and search right away
         let advanceFlag;
         if (previousSearchText !== currentSearchText) {
             current_search_index = -1;
@@ -38,14 +42,21 @@ document.addEventListener("DOMContentLoaded", function () {
             advanceFlag = advance;
         }
 
-        // Remove any previous wrapping before pre‑processing.
-        unwrapMatches();
-
-        // Wait for hideWords to finish processing.
-        await hideWords();
-
-        // Pre‑process eligible matches by wrapping them.
-        wrapEligibleMatches();
+        if((previous_bracketed_text !== document.getElementById('main-text').value && previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value)){
+            // Remove any previous wrapping before pre‑processing.
+            unwrapMatches();
+            // Wait for hideWords to finish processing.
+            await hideWords();
+            // Pre‑process eligible matches by wrapping them.
+            wrapEligibleMatches();
+            previous_bracketed_text = document.getElementById('main-text').value;
+            previous_hide_index = globalHiddenIndexes.slice();
+            previous_bracket_search = document.getElementById('searchtext').value;
+            console.log("showing new search");
+        }
+        else{
+            console.log("showing old search");
+        }
 
         // Now perform the search (which works on the wrapped text).
         // Pass the advance flag so that if the search text is unchanged,
@@ -147,7 +158,7 @@ function wrapEligibleMatches() {
     updatedText += textContent.substring(lastIndex);
     //manualValueChange(updatedText);
     document.getElementById("main-text").value = updatedText;
-    hideWords();
+    //hideWords();
 }
 
 /**

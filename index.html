@@ -111,7 +111,7 @@
 </head>
 <body style="background-color: #262626;">
     <nav>
-        <div class="nav-wrapper" onclick="document.getElementById('text_search').value='';document.getElementById('search-navigation').classList.add('tn_hidden');document.getElementById('search-info').innerHTML = '';if (document.getElementById('main-text').value.includes('(') || document.getElementById('main-text').value.includes(')')) unwrapMatches();">
+        <div class="nav-wrapper">
             <div class="brand-logo center" onclick="checkPayday()" style="cursor: pointer;">
                 <span style="font-size: 15px;" id="date"></span>
                 <img src="images/logo_mini.png">
@@ -240,9 +240,9 @@
         <li class="divider"></li>
         <li> <a class="modal-trigger" href="#add_csw_list" onclick="document.getElementById('hide_list').value = '';">Add CSW</a></li>
         <li class="divider"></li>
-        <li> <a onclick="processCSWMatches()">Get CSW List</a></li>
+        <li> <a onclick="calibrate_brackets();processCSWMatches();">Get CSW List</a></li>
         <li class="divider"></li>
-        <li> <a class="modal-trigger" onclick="csw_delete()">Delete CSW</a></li>
+        <li> <a class="modal-trigger" onclick="calibrate_brackets();csw_delete()">Delete CSW</a></li>
     </ul>
 
     <!-- segment add model -->

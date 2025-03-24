@@ -235,3 +235,13 @@ document.addEventListener("DOMContentLoaded", function () {
       }
   });
 });
+
+function calibrate_brackets()
+{
+  if (document.getElementById('main-text').value.includes('(') || document.getElementById('main-text').value.includes(')')){
+  document.getElementById('text_search').value='';
+  document.getElementById('search-navigation').classList.add('tn_hidden');
+  document.getElementById('search-info').innerHTML = '';
+   unwrapMatches();
+  }
+}
