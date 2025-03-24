@@ -69,6 +69,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     fetchWithTimeout(event.request, 60000)
       .then(response => {
+        // If we get a good network response, update the cache.
         if (response && response.status === 200 && response.type === 'basic') {
           const copy = response.clone();
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
@@ -76,8 +77,10 @@ self.addEventListener('fetch', (event) => {
         return response;
       })
       .catch(() => {
+        // If network fails, try to return from the cache.
         return caches.match(event.request).then(cached => {
           if (cached) return cached;
+          // If a navigation request, fall back to the cached index.html.
           if (event.request.mode === 'navigate') {
             return caches.match(`${BASE_URL}/index.html`);
           }
@@ -86,20 +89,27 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
-// When the page asks, do a simple check: try to fetch index.html without using cache.
-// If that fails, assume the SW loaded from cache.
+// Updated message event: Check online status by trying to refresh a key resource.
 self.addEventListener('message', (event) => {
   if (event.data === 'CHECK_ONLINE_STATUS') {
-    // Force a network request (no cache) to determine if network is really available.
-    fetchWithTimeout(`${BASE_URL}/index.html`, 30000, { cache: 'no-store' })
-      .then(() => {
-        // Network fetch worked → we're online.
-        event.source.postMessage({ status: 'ONLINE' });
+    // Force a network request (bypassing cache) for index.html
+    fetchWithTimeout(`${BASE_URL}/index.html`, 30000, { cache: 'reload' })
+      .then(response => {
+        if (response.ok) {
+          // Successfully fetched from the network: update the cache.
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(`${BASE_URL}/index.html`, response.clone());
+          });
+          // Report ONLINE status.
+          event.source.postMessage({ status: 'ONLINE' });
+        } else {
+          // If the server returns a bad response, fall back to the cache.
+          event.source.postMessage({ status: 'OFFLINE' });
+        }
       })
       .catch(() => {
-        // Network fetch failed → we're using cache → offline.
+        // Fetch failed (could be no internet or server error) → offline.
         event.source.postMessage({ status: 'OFFLINE' });
       });
   }
 });
-//testtest

@@ -10,44 +10,72 @@ function toggleReplaceAllMenu() {
 document.addEventListener("DOMContentLoaded", function () {
     const searchBox = document.getElementById("text_search");
     const searchDirection = 'right';  // Default direction
+    let debounceTimer;
 
-    // When Enter is pressed in the search box...
+    // Define non-character keys to ignore.
+    const ignoreKeys = new Set([
+        "ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown",
+        "Shift", "Control", "Alt", "Meta", "CapsLock", "Tab", "Enter"
+    ]);
+
+    // Define a function that performs the search logic.
+    async function triggerSearch(advance) {
+        const currentSearchText = searchBox.value;
+        if (!currentSearchText) return; // Do nothing if empty
+
+        document.getElementById('searchtext').value = currentSearchText;
+        document.getElementById('search-info').innerHTML = "Searching...";
+
+        // If the search text has changed, reset the search state.
+        let advanceFlag;
+        if (previousSearchText !== currentSearchText) {
+            current_search_index = -1;
+            currentMatchOrder = 1;
+            previousSearchText = currentSearchText;
+            advanceFlag = true; // New search: allow advancing
+        } else {
+            // Same search text; respect the advance flag passed in.
+            advanceFlag = advance;
+        }
+
+        // Remove any previous wrapping before pre‑processing.
+        unwrapMatches();
+
+        // Wait for hideWords to finish processing.
+        await hideWords();
+
+        // Pre‑process eligible matches by wrapping them.
+        wrapEligibleMatches();
+
+        // Now perform the search (which works on the wrapped text).
+        // Pass the advance flag so that if the search text is unchanged,
+        // the current_search_index is maintained.
+        searchAndSelectText(searchDirection, advanceFlag);
+    }
+
+    // Listen for key events in the search box.
     searchBox.addEventListener("keydown", async function (event) {
+        // If Enter is pressed, trigger immediately if there is some search text.
         if (event.key === "Enter" && searchBox.value) {
-            const currentSearchText = searchBox.value;
-            document.getElementById('searchtext').value = currentSearchText;
-            document.getElementById('search-info').innerHTML = "Searching...";
-            // If the search text has changed, reset the search state.
-            let advance;
-            if (previousSearchText !== currentSearchText) {
-                current_search_index = -1;
-                currentMatchOrder = 1;
-                previousSearchText = currentSearchText;
-                advance = true; // new search: allow advancing
-            } else {
-                // Same search text; do not auto-advance to the next match.
-                advance = false;
-            }
-            
-            // Remove any previous wrapping before pre‑processing.
-            unwrapMatches();
+            clearTimeout(debounceTimer);
+            await triggerSearch(true);
+            event.preventDefault(); // Prevent form submission if applicable
+            return;
+        }
 
-            // Wait for hideWords to finish processing.
-            await hideWords();
-            
-            // Pre‑process eligible matches by wrapping them with ( and ).
-            wrapEligibleMatches();
-            
-            // Now perform the search (which works on the wrapped text).
-            // Pass the advance flag so that if the search text is unchanged,
-            // the current_search_index is kept.
-            searchAndSelectText(searchDirection, advance);
-            
-            // Prevent form submission if inside a form.
-            event.preventDefault();
+        // Only trigger debounce for keys that may change the text.
+        if (!ignoreKeys.has(event.key)) {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(async () => {
+                // Only trigger if the search text has actually changed.
+                if (searchBox.value && searchBox.value !== previousSearchText) {
+                    await triggerSearch(true);
+                }
+            }, 2000);
         }
     });
 });
+
 
 
 /**

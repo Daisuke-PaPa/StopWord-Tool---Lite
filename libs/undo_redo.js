@@ -83,8 +83,8 @@ function restoreState(state,msg) {
     textArea.blur();
     textArea.focus();
     textArea.setSelectionRange(state.cursor, state.cursor);
-    if(msg=="redo"){showStatusNotification("ရှေ့ဆက်ဖို့အားထုတ်မှ ပြန်လည်ကာသတိရမိ")};
-    if(msg=="undo"){showStatusNotification("နောက်ဆုတ်ဖို့ကြိုးစားရင်းရှေ့တိုးမိ")};
+    if(msg=="redo"){showStatusNotification("Redone")};
+    if(msg=="undo"){showStatusNotification("Undone")};
   }
 }
 

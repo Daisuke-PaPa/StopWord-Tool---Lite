@@ -28,16 +28,15 @@ function copyAndRedirect() {
     }
 }
 
-//lol
 function checkPayday() {
     const today = new Date();
     const year = today.getFullYear();
     const month = today.getMonth();
-    
-    // Get last day of the month
-    let payday = new Date(year, month + 1, 0);
 
-    // If the last day is Sunday, move it to Saturday
+    // Set payday as the 5th day of next month
+    let payday = new Date(year, month + 1, 5);
+
+    // If the 5th is a Sunday, move it to Saturday
     if (payday.getDay() === 0) {
         payday.setDate(payday.getDate() - 1);
     }
@@ -47,9 +46,10 @@ function checkPayday() {
 
     // Check if today is payday
     if (daysLeft === 0) {
-        showStatusNotification('ဒီနေ့လစာထုတ်ပြီကွ!')
+        showStatusNotification('ဒီနေ့လစာထုတ်ပြီကွ!');
     } else {
         console.log(`📅 ${daysLeft} days left until payday.`);
-        showStatusNotification('လစာထုတ်ဖို့ '+ (daysLeft) + ' ရက်လိုသေးတယ် -_-');
+        showStatusNotification('လစာထုတ်ဖို့ ' + daysLeft + ' ရက်လိုသေးတယ် -_-');
     }
 }
+
