@@ -67,7 +67,7 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
-    fetchWithTimeout(event.request, 60000)
+    fetchWithTimeout(event.request, 30000)
       .then(response => {
         // If we get a good network response, update the cache.
         if (response && response.status === 200 && response.type === 'basic') {
