@@ -89,7 +89,7 @@ async function processCSWMatches() {
 }
 
 const cswPrefixList = ['‌ေ','က'];
-const cswSuffixList = ['က့်','င့်','စ့်','ည့်','မ့်','န့်','‌ေ','‌ည့်', 'က်', 'ခ်', 'ဂ်', 'ဃ်', 'င်', 'စ်', 'ဆ်', 'ဇ်', 'ဈ်', 'ဉ်', 'ည်', 'ဋ်', 'ဌ်', 'ဍ်', 'ဎ်', 'ဏ်', 'တ်', 'ထ်', 'ဒ်', 'ဓ်', 'န်', 'ပ်', 'ဖ်', 'ဗ်', 'ဘ်', 'မ်', 'ယ်', 'ရ်', 'လ်', 'ဝ်', 'ဟ်', 'သ်', 'ဟ်', 'ဠ်', 'အ်' , 'ဿ်', 'ာ', 'ါ', 'ိ', 'ီ', 'ု', 'ူ', 'ဲ', 'ံ', '့', 'း', '်', 'ျ', 'ွ', 'ှ', 'ြ','ြာ်']; 
+const cswSuffixList = ['က့်','င့်','စ့်','ည့်','မ့်','န့်','‌ည့်', 'က်', 'ခ်', 'ဂ်', 'ဃ်', 'င်', 'စ်', 'ဆ်', 'ဇ်', 'ဈ်', 'ဉ်', 'ည်', 'ဋ်', 'ဌ်', 'ဍ်', 'ဎ်', 'ဏ်', 'တ်', 'ထ်', 'ဒ်', 'ဓ်', 'န်', 'ပ်', 'ဖ်', 'ဗ်', 'ဘ်', 'မ်', 'ယ်', 'ရ်', 'လ်', 'ဝ်', 'ဟ်', 'သ်', 'ဟ်', 'ဠ်', 'အ်' , 'ဿ်', 'ာ', 'ါ', 'ိ', 'ီ', 'ု', 'ူ', 'ဲ', 'ံ', '့', 'း', '်', 'ျ', 'ွ', 'ှ', 'ြ','ြာ်']; 
 
 
 async function csw_delete() {
@@ -121,22 +121,20 @@ async function csw_delete() {
       console.log(`Searching from index ${lastIndex}: Found "${searchValue}" at index ${foundIndex}`);
       
       if (foundIndex !== -1) {
-        // Check if the match is inside any bracketed region
-        let isHidden = globalHiddenIndexes.some(bracket => foundIndex >= bracket.start && foundIndex <= bracket.end);
-        
-        if (isHidden) {
-          console.log(`Skipping "${searchValue}" at index ${foundIndex} (inside brackets)`);
-          lastIndex = foundIndex + searchValue.length;
-          skipped++;
-          continue;
+        // Use isInHiddenRanges to determine if the match is within a hidden bracketed region.
+        if (isInHiddenRanges(foundIndex, searchValue.length)) {
+            console.log(`Skipping "${searchValue}" at index ${foundIndex} (inside brackets)`);
+            lastIndex = foundIndex + searchValue.length;
+            skipped++;
+            continue;
         }
         
         // Check if the word has a CSW suffix before replacing it
         if (hasCswSuffix(mainText, searchValue, foundIndex)) {
-          console.log(`Skipping "${searchValue}" at index ${foundIndex} due to CSW suffix`);
-          lastIndex = foundIndex + searchValue.length;
-          skipped++;
-          continue;
+            console.log(`Skipping "${searchValue}" at index ${foundIndex} due to CSW suffix`);
+            lastIndex = foundIndex + searchValue.length;
+            skipped++;
+            continue;
         }
         
         console.log(`Replacing "${searchValue}" at index ${foundIndex}`);
@@ -144,7 +142,8 @@ async function csw_delete() {
         mainText = mainText.substring(0, foundIndex) + placeholder + mainText.substring(foundIndex + searchValue.length);
         lastIndex = foundIndex + placeholder.length;
         deleted++;
-      } else {
+    }
+     else {
         console.log(`No more matches found for "${searchValue}" from index ${lastIndex}`);
         break;
       }

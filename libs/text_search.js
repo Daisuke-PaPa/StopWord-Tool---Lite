@@ -93,6 +93,7 @@ function isInHiddenRanges(matchIndex, matchLength) {
     return false;
 }
 
+
 /**
  * Remove any previous wrapping by replacing every occurrence of
  * "(" + searchText + ")" with searchText.
