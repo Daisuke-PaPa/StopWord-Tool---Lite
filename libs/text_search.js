@@ -43,7 +43,7 @@ document.addEventListener("DOMContentLoaded", function () {
         }
         // Wait for hideWords to finish processing.
         await hideWords();
-        if((previous_bracketed_text !== document.getElementById('main-text').value) || (previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value) || (document.getElementById("filtered_search").checked)){
+        if((previous_bracketed_text !== document.getElementById('main-text').value) || (previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value) || (document.getElementById("filtered_search").checked == false)){
             // Remove any previous wrapping before pre‑processing.
             unwrapMatches();
             // Pre‑process eligible matches by wrapping them.
