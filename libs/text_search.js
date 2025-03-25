@@ -41,12 +41,11 @@ document.addEventListener("DOMContentLoaded", function () {
             // Same search text; respect the advance flag passed in.
             advanceFlag = advance;
         }
-
-        if((previous_bracketed_text !== document.getElementById('main-text').value && previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value) || (document.getElementById("filtered_search").checked)){
+        // Wait for hideWords to finish processing.
+        await hideWords();
+        if((previous_bracketed_text !== document.getElementById('main-text').value) || (previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value) || (document.getElementById("filtered_search").checked)){
             // Remove any previous wrapping before pre‑processing.
             unwrapMatches();
-            // Wait for hideWords to finish processing.
-            await hideWords();
             // Pre‑process eligible matches by wrapping them.
             wrapEligibleMatches();
             previous_bracketed_text = document.getElementById('main-text').value;
