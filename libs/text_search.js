@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function () {
             advanceFlag = advance;
         }
 
-        if((previous_bracketed_text !== document.getElementById('main-text').value && previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value)){
+        if((previous_bracketed_text !== document.getElementById('main-text').value && previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value) || (document.getElementById("filtered_search").checked)){
             // Remove any previous wrapping before pre‑processing.
             unwrapMatches();
             // Wait for hideWords to finish processing.
@@ -373,7 +373,7 @@ async function replaceAllText() {
         const regex = new RegExp(escapeRegExp(target), "g");
         const updatedText = textContent.replace(regex, '');
         manualValueChange(updatedText);
-        hideWords();
+        await hideWords();
         showStatusNotification("Deleted '" + searchValue + "'");
     } else {
         await hideWords();
