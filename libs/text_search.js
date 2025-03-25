@@ -361,19 +361,22 @@ function replaceAllText() {
     const searchValue = document.getElementById("searchtext").value;
     if (!searchValue) return;
     
+    // Modify the search text to include parentheses, e.g. "dog" becomes "(dog)"
+    const modifiedSearch = `(${searchValue})`;
+    
     const textBox = document.getElementById("main-text");
     const textContent = textBox.value;
     
-    // Create a regex to match all occurrences of the search text.
-    const regex = new RegExp(escapeRegExp(searchValue), "g");
+    // Create a regex to match all occurrences of the modified search text.
+    const regex = new RegExp(escapeRegExp(modifiedSearch), "g");
     
-    // Replace every match with the search text wrapped in parentheses.
-    const updatedText = textContent.replace(regex, `(${searchValue})`);
+    // Replace all matches (i.e. remove them).
+    const updatedText = textContent.replace(regex, '');
     
-    // Update the main text and then call hideWords().
     manualValueChange(updatedText);
     hideWords();
 }
+
 
 
 function escapeRegExp(string) {
