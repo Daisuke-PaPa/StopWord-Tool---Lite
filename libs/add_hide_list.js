@@ -27,7 +27,7 @@ async function add_hide_list() {
         let promises = hideArray.map(hideItem => addDataToGroup("hide_list", { hide_item: hideItem }));
 
         await Promise.all(promises); // Wait for all segments to be added
-        //await hideWords(true);
+        await hideWords(true);
         showStatusNotification('Word(s) hidden successfully ^_^', true);
         
         // Clear the text areas after adding segments
