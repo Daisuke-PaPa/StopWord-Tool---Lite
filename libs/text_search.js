@@ -357,24 +357,57 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 
-function replaceAllText() {
+async function replaceAllText() {
     const searchValue = document.getElementById("searchtext").value;
     if (!searchValue) return;
     
-    // Create the target string with parentheses, e.g., "dog" becomes "(dog)"
-    const target = `(${searchValue})`;
-    
+    const textSearchValue = document.getElementById("text_search").value;
     const textBox = document.getElementById("main-text");
     const textContent = textBox.value;
     
-    // Build a regex to match the target exactly
-    const regex = new RegExp(escapeRegExp(target), "g");
-    
-    // Remove all occurrences of the target string from the text
-    const updatedText = textContent.replace(regex, '');
-    
-    manualValueChange(updatedText);
-    hideWords();
+    // If the two search fields match, use the brute force method.
+    if (textSearchValue === searchValue) {
+        // Brute force: first, assume somewhere the search value was wrapped in ()
+        // so our target is (searchValue) and we simply delete all its occurrences.
+        const target = `(${searchValue})`;
+        const regex = new RegExp(escapeRegExp(target), "g");
+        const updatedText = textContent.replace(regex, '');
+        manualValueChange(updatedText);
+        hideWords();
+        showStatusNotification("Deleted '" + searchValue + "'");
+    } else {
+        await hideWords();
+        // Otherwise, use the old method.
+        const replaceValue = document.getElementById("replacetext").value;
+        const safeSearchValue = escapeRegExp(searchValue);
+        const regex = new RegExp(safeSearchValue, "g");
+        let updatedText = "";
+        let lastIndex = 0;
+        let match;
+        while ((match = regex.exec(textContent)) !== null) {
+            const matchIndex = match.index;
+            updatedText += textContent.substring(lastIndex, matchIndex);
+            if (!isInHiddenRanges(matchIndex, searchValue.length) &&
+                !hasCswSuffix(textContent, searchValue, matchIndex)) {
+                updatedText += replaceValue;
+            } else {
+                updatedText += textContent.substr(matchIndex, searchValue.length);
+            }
+            lastIndex = matchIndex + searchValue.length;
+        }
+        updatedText += textContent.substring(lastIndex);
+        if(textSearchValue == searchValue){
+            updatedText = updatedText.replace(/[()]/g, '');
+        }
+        manualValueChange(updatedText);
+        hideWords();
+        
+        if (replaceValue !== '') {
+            showStatusNotification("Replaced '" + searchValue + "' with '" + replaceValue + "'");
+        } else {
+            showStatusNotification("Deleted '" + searchValue + "'");
+        }
+    }
 }
 
 
