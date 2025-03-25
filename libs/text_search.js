@@ -3,9 +3,7 @@ let currentMatchOrder = 1;         // 1-indexed order of the current wrapped mat
 let cachedValidMatches = [];         // Cached array of wrapped matches.
 let previousSearchText = "";         // Store previous search text
 
-let previous_bracketed_text = "";
-let previous_hide_index = [];
-let previous_bracket_search = "";
+let search_output = "";
 
 function toggleReplaceAllMenu() {
     document.getElementById("replace-all-menu").classList.toggle("tn_hidden");
@@ -41,22 +39,19 @@ document.addEventListener("DOMContentLoaded", function () {
             // Same search text; respect the advance flag passed in.
             advanceFlag = advance;
         }
-        // Wait for hideWords to finish processing.
-        await hideWords();
-        if((previous_bracketed_text !== document.getElementById('main-text').value) || (previous_hide_index !== globalHiddenIndexes) || (previous_bracket_search !== document.getElementById('searchtext').value) || (document.getElementById("filtered_search").checked == false)){
-            // Remove any previous wrapping before pre‑processing.
-            unwrapMatches();
-            // Pre‑process eligible matches by wrapping them.
-            wrapEligibleMatches();
-            previous_bracketed_text = document.getElementById('main-text').value;
-            previous_hide_index = globalHiddenIndexes.slice();
-            previous_bracket_search = document.getElementById('searchtext').value;
+        // Pre‑process eligible matches by wrapping them.
+        search_output = await wrapEligibleMatches();
+        // this is not the end
+        if(search_output !== document.getElementById('main-text').value)
+        {
+
+            document.getElementById('main-text').value = search_output;
             console.log("showing new search");
         }
-        else{
+        else
+        {
             console.log("showing old search");
         }
-
         // Now perform the search (which works on the wrapped text).
         // Pass the advance flag so that if the search text is unchanged,
         // the current_search_index is maintained.
@@ -123,12 +118,12 @@ async function unwrapMatches() {
  * For each eligible occurrence (not hidden and not having a csw suffix),
  * wrap it with "(" and ")".
  */
-function wrapEligibleMatches() {
+async function wrapEligibleMatches() {
     const searchText = document.getElementById("text_search").value;
     if (!searchText) return;
     
-    const textBox = document.getElementById("main-text");
-    const textContent = textBox.value;
+    let textBox = document.getElementById("main-text");
+    let textContent = textBox.value.replace(/[()]/g, '');
     let updatedText = "";
     let lastIndex = 0;
     const regex = new RegExp(searchText, "g");
@@ -156,7 +151,7 @@ function wrapEligibleMatches() {
     }
     updatedText += textContent.substring(lastIndex);
     //manualValueChange(updatedText);
-    document.getElementById("main-text").value = updatedText;
+    return updatedText;
     //hideWords();
 }
 

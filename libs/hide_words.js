@@ -2,7 +2,7 @@ let globalHiddenIndexes = [];
 const textarea = document.getElementById("main-text");
 var current_text = document.getElementById("main-text").value;
 
-function hideWords(force_reload = false) {
+function hideWords() {
     return fetchGroupData('hide_list')
         .then(groupData => {
             let editorText = document.getElementById('main-text').value;
