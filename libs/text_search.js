@@ -359,41 +359,22 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function replaceAllText() {
     const searchValue = document.getElementById("searchtext").value;
-    const replaceValue = document.getElementById("replacetext").value;
-    const textBox = document.getElementById("main-text");
-    const search_box = document.getElementById('text_search').value;
-    const textContent = textBox.value;
     if (!searchValue) return;
     
-    const safeSearchValue = escapeRegExp(searchValue);
-    const regex = new RegExp(safeSearchValue, "g");
-    let updatedText = "";
-    let lastIndex = 0;
-    let match;
-    while ((match = regex.exec(textContent)) !== null) {
-        const matchIndex = match.index;
-        updatedText += textContent.substring(lastIndex, matchIndex);
-        if (!isInHiddenRanges(matchIndex, searchValue.length) &&
-            !hasCswSuffix(textContent, searchValue, matchIndex)) {
-            updatedText += replaceValue;
-        } else {
-            updatedText += textContent.substr(matchIndex, searchValue.length);
-        }
-        lastIndex = matchIndex + searchValue.length;
-    }
-    updatedText += textContent.substring(lastIndex);
-    if(search_box == searchValue){
-        updatedText = updatedText.replace(/[()]/g, '');
-    }
+    const textBox = document.getElementById("main-text");
+    const textContent = textBox.value;
+    
+    // Create a regex to match all occurrences of the search text.
+    const regex = new RegExp(escapeRegExp(searchValue), "g");
+    
+    // Replace every match with the search text wrapped in parentheses.
+    const updatedText = textContent.replace(regex, `(${searchValue})`);
+    
+    // Update the main text and then call hideWords().
     manualValueChange(updatedText);
     hideWords();
-    
-    if (replaceValue !== '') {
-        showStatusNotification("Replaced '" + searchValue + "' with '" + replaceValue + "'");
-    } else {
-        showStatusNotification("Deleted '" + searchValue + "'");
-    }
 }
+
 
 function escapeRegExp(string) {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
