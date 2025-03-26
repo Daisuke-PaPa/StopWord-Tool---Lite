@@ -416,8 +416,8 @@ async function replaceAllText() {
         } else {
             document.getElementById('main-text').value = updatedText;
             await hideWords();
-            updatedText = await wrapEligibleMatches();
             await manualValueChange(updatedText);
+            updatedText = await wrapEligibleMatches();
             searchAndSelectText("right", false);
         }
     }    
