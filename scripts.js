@@ -242,6 +242,15 @@ function calibrate_brackets()
   document.getElementById('text_search').value='';
   document.getElementById('search-navigation').classList.add('tn_hidden');
   document.getElementById('search-info').innerHTML = '';
-   unwrapMatches();
+  unwrapMatches();
+  }
+}
+
+function MEH()
+{
+  if (document.getElementById('main-text').value.includes('(') || document.getElementById('main-text').value.includes(')')){
+  document.getElementById('text_search').value='';
+  document.getElementById('search-navigation').classList.add('tn_hidden');
+  document.getElementById('search-info').innerHTML = '';
   }
 }

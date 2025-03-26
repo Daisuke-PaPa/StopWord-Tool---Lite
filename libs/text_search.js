@@ -3,7 +3,10 @@ let currentMatchOrder = 1;         // 1-indexed order of the current wrapped mat
 let cachedValidMatches = [];         // Cached array of wrapped matches.
 let previousSearchText = "";         // Store previous search text
 
-let search_output = "";
+let past_search = "";
+let past_text = "";
+let past_hidegroup = "";
+let past_filter = false;
 
 function toggleReplaceAllMenu() {
     document.getElementById("replace-all-menu").classList.toggle("tn_hidden");
@@ -28,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.getElementById('searchtext').value = currentSearchText;
         document.getElementById('search-info').innerHTML = "Searching...";
 
-        // If the search text has changed, reset the search state and search right away
+        // If the search text has changed, reset the search state
         let advanceFlag;
         if (previousSearchText !== currentSearchText) {
             current_search_index = -1;
@@ -39,14 +42,20 @@ document.addEventListener("DOMContentLoaded", function () {
             // Same search text; respect the advance flag passed in.
             advanceFlag = advance;
         }
-        // Pre‑process eligible matches by wrapping them.
-        search_output = await wrapEligibleMatches();
-        // this is not the end
-        if(search_output !== document.getElementById('main-text').value)
-        {
 
-            document.getElementById('main-text').value = search_output;
+
+        await fetchGroupData('hide_list').then(globalhideGroup => {hide_json = JSON.stringify(globalhideGroup);console.log("HideJSON"+hide_json)});
+        console.log(past_hidegroup);
+        if(past_search !== searchBox.value || past_text !== document.getElementById("main-text").value || hide_json !== past_hidegroup || past_filter !== document.getElementById('filtered_search').checked)
+        {
+            await unwrapMatches();
+            document.getElementById('main-text').value = await wrapEligibleMatches();
             console.log("showing new search");
+
+            past_search = searchBox.value;
+            past_text = document.getElementById("main-text").value;
+            past_hidegroup = hide_json;
+            past_filter = document.getElementById('filtered_search').checked;
         }
         else
         {
@@ -63,7 +72,7 @@ document.addEventListener("DOMContentLoaded", function () {
         // If Enter is pressed, trigger immediately if there is some search text.
         if (event.key === "Enter" && searchBox.value) {
             clearTimeout(debounceTimer);
-            await triggerSearch(true);
+            await triggerSearch(false);
             event.preventDefault(); // Prevent form submission if applicable
             return;
         }
@@ -74,7 +83,7 @@ document.addEventListener("DOMContentLoaded", function () {
             debounceTimer = setTimeout(async () => {
                 // Only trigger if the search text has actually changed.
                 if (searchBox.value && searchBox.value !== previousSearchText) {
-                    await triggerSearch(true);
+                    await triggerSearch(false);
                 }
             }, 2000);
         }

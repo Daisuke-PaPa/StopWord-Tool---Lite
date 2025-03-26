@@ -1,10 +1,13 @@
 let globalHiddenIndexes = [];
+let hide_json = "";
 const textarea = document.getElementById("main-text");
 var current_text = document.getElementById("main-text").value;
 
 function hideWords() {
+    console.log('hide_call');
     return fetchGroupData('hide_list')
-        .then(groupData => {
+        .then(globalhideGroup => {
+            hide_json = JSON.stringify(globalhideGroup);
             let editorText = document.getElementById('main-text').value;
             let intervals = [];
 
@@ -31,7 +34,7 @@ function hideWords() {
             }
 
             // For each hidden item, find all occurrences in the editor text.
-            groupData.forEach(item => {
+            globalhideGroup.forEach(item => {
                 let word = item.hide_item;
                 if (!word) return;
                 let pos = editorText.indexOf(word);
@@ -74,8 +77,8 @@ function hideWords() {
 
 
 // Listen for user input and adjust indexes dynamically
-textarea.addEventListener("input", async (event) => {
-    console.log('recalculating');
-    await hideWords();  // Call your hideWords function
-    console.log('done');
-});
+//textarea.addEventListener("input", async (event) => {
+   // console.log('recalculating');
+    //await hideWords();  // Call your hideWords function
+    //console.log('done');
+//});
