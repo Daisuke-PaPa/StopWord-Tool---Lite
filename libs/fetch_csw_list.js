@@ -2,11 +2,9 @@ let globalCSWMatches = [];     // We'll update this below
 
 // This function processes the CSW list and updates the csw_list_textbox.
 async function processCSWMatches() {
-  // Optionally, fix spacing first if needed.
-  await fixSpacing();
-
   // Get the editor text.
-  let editorText = document.getElementById('main-text').value;
+  let editorText = await fixSpacing(true);
+  editorText = editorText.replace(/[()]/g, '');
 
   // Fetch the csw_list data from the database.
   fetchGroupData('csw_list').then(groupData => {
@@ -94,6 +92,7 @@ const cswSuffixList = ['က့်','င့်','စ့်','ည့်','မ့�
 
 async function csw_delete() {
   
+  await hideWords();
   // Fetch the value from the 'csw_list_textbox' textbox
   let cswList = document.getElementById('csw_list_textbox').value;
   let cswArray = cswList.split('\n');

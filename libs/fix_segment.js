@@ -1,4 +1,4 @@
-async function fixSpacing() {
+async function fixSpacing(pass_value=false) {
     const textarea = document.getElementById('main-text');
     if (!textarea) {
         showStatusNotification("Textarea not found!", false);
@@ -31,8 +31,8 @@ async function fixSpacing() {
         content = content.replaceAll("_", "_ ");
 
     } while (previousContent !== content);
-    manualValueChange(content);
-    await hideWords();
+    if(pass_value==false){manualValueChange(content);await hideWords();}
+    else if(pass_value){return content;}
 }
 
 

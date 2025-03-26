@@ -386,6 +386,11 @@ async function replaceAllText() {
         }
     } else {
         // Old method:
+        await unwrapMatches();
+        // Re-read the textContent after unwrapping:
+        const textBox = document.getElementById("main-text");
+        const textContent = textBox.value;
+    
         const safeSearchValue = escapeRegExp(searchValue);
         const regex = new RegExp(safeSearchValue, "g");
         let updatedText = "";
@@ -403,17 +408,19 @@ async function replaceAllText() {
             lastIndex = matchIndex + searchValue.length;
         }
         updatedText += textContent.substring(lastIndex);
-        // (The following line preserves the old behavior to remove parentheses if text_search matches searchValue)
+    
+        // Preserve the old behavior: if text_search matches searchValue, remove parentheses.
         if (textSearchValue == searchValue) {
             updatedText = updatedText.replace(/[()]/g, '');
-        }
-        await manualValueChange(updatedText);
-        if (replaceValue !== '') {
-            showStatusNotification("Replaced '" + searchValue + "' with '" + replaceValue + "'");
+            await manualValueChange(updatedText);
         } else {
-            showStatusNotification("Deleted '" + searchValue + "'");
+            document.getElementById('main-text').value = updatedText;
+            await hideWords();
+            updatedText = await wrapEligibleMatches();
+            await manualValueChange(updatedText);
+            searchAndSelectText("right", false);
         }
-    }
+    }    
 }
 
 
