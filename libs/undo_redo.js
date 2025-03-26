@@ -105,7 +105,7 @@ function redo() {
 }
 
 // Manually trigger a change when the value of the textarea is altered programmatically
-function manualValueChange(newValue) {
+async function manualValueChange(newValue) {
   if (!textArea) return;
   
   const current = history[currentHistoryIndex] || { text: "", cursor: textArea.selectionStart };
@@ -118,7 +118,7 @@ function manualValueChange(newValue) {
   textArea.value = newValue;
   const currentCursor = textArea.selectionStart;
   saveState(newValue, currentCursor);
-  hideWords();
+  await hideWords();
 }
 
 // Initialize the textarea when the page loads

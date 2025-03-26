@@ -367,21 +367,25 @@ async function replaceAllText() {
     const textSearchValue = document.getElementById("text_search").value;
     const textBox = document.getElementById("main-text");
     const textContent = textBox.value;
+    const replaceValue = document.getElementById("replacetext").value;
     
-    // If the two search fields match, use the brute force method.
     if (textSearchValue === searchValue) {
-        // Brute force: first, assume somewhere the search value was wrapped in ()
-        // so our target is (searchValue) and we simply delete all its occurrences.
+        // Brute force method:
+        // 1. Create the target string by wrapping searchValue with parentheses.
+        // 2. Use the replacement value (if provided) or delete (if empty).
         const target = `(${searchValue})`;
         const regex = new RegExp(escapeRegExp(target), "g");
-        const updatedText = textContent.replace(regex, '');
-        manualValueChange(updatedText);
-        await hideWords();
-        showStatusNotification("Deleted '" + searchValue + "'");
+        const updatedText = textContent.replace(regex, replaceValue);
+        
+        await manualValueChange(updatedText);
+        
+        if (replaceValue !== '') {
+            showStatusNotification("Replaced '" + target + "' with '" + replaceValue + "'");
+        } else {
+            showStatusNotification("Deleted '" + target + "'");
+        }
     } else {
-        await hideWords();
-        // Otherwise, use the old method.
-        const replaceValue = document.getElementById("replacetext").value;
+        // Old method:
         const safeSearchValue = escapeRegExp(searchValue);
         const regex = new RegExp(safeSearchValue, "g");
         let updatedText = "";
@@ -399,12 +403,11 @@ async function replaceAllText() {
             lastIndex = matchIndex + searchValue.length;
         }
         updatedText += textContent.substring(lastIndex);
-        if(textSearchValue == searchValue){
+        // (The following line preserves the old behavior to remove parentheses if text_search matches searchValue)
+        if (textSearchValue == searchValue) {
             updatedText = updatedText.replace(/[()]/g, '');
         }
-        manualValueChange(updatedText);
-        hideWords();
-        
+        await manualValueChange(updatedText);
         if (replaceValue !== '') {
             showStatusNotification("Replaced '" + searchValue + "' with '" + replaceValue + "'");
         } else {
@@ -412,8 +415,6 @@ async function replaceAllText() {
         }
     }
 }
-
-
 
 
 function escapeRegExp(string) {
