@@ -71,6 +71,7 @@ function saveState(currentValue, cursorPosition) {
   
   history.push({ text: currentValue, cursor: cursorPosition });
   currentHistoryIndex = history.length - 1;
+  console.log(history);
 }
 
 // Restore a saved state exactly as saved
@@ -104,22 +105,45 @@ function redo() {
   }
 }
 
-// Manually trigger a change when the value of the textarea is altered programmatically
 async function manualValueChange(newValue) {
   if (!textArea) return;
   
+  // Prevent recursive saves if a change is already being processed
+  if (isSaving) return;
+  isSaving = true;
+  
+  // Get the current state from history (or default)
   const current = history[currentHistoryIndex] || { text: "", cursor: textArea.selectionStart };
-  // Only update if newValue differs from the current state
+  
+  // Check if the new value is actually different from the current state
   if (current.text === newValue) {
     console.log("New value matches current history. No update.");
+    isSaving = false;
     return;
   }
   
+  // Set the new value on the textArea
   textArea.value = newValue;
+  
+  // Capture the new cursor position (it might be reset by setting the value)
   const currentCursor = textArea.selectionStart;
+  
+  // If not at the end of the history, truncate future states
+  if (currentHistoryIndex < history.length - 1) {
+    history = history.slice(0, currentHistoryIndex + 1);
+  }
+  
+  // Save the new state with both text and cursor position
   saveState(newValue, currentCursor);
+  
+  // Update the last saved text so that future changes compare correctly
+  lastSavedText = newValue;
+  
+  isSaving = false;
+  
   await hideWords();
 }
+
 
 // Initialize the textarea when the page loads
 document.addEventListener('DOMContentLoaded', initTextArea);

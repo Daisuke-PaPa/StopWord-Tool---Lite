@@ -420,7 +420,8 @@ async function replaceAllText() {
             updatedText = await wrapEligibleMatches();
             searchAndSelectText("right", false);
         }
-    }    
+    }
+    MEH();
 }
 
 
