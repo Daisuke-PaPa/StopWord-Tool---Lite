@@ -57,11 +57,15 @@ function downloadFile() {
       text = text.replace(/  /g, ' '); // Replace double spaces with a single space
   } while (text !== previousText); // Continue until no changes are made
 
-  // Remove common special characters using the provided regex
+  // Remove common special characters using the modified regex
+  // Excludes full stop (.), '&', and '%' from removal.
   text = text.replace(
-    /[\\~!@#$%^&*()_\-+=`|{}\[\]:";'<>.,?\/…၊။•↪⭐■▪━༻༺“”‘’–—]|[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, 
+    /[\\~!@#$^*()_\-+=`|{}\[\]:";'<>?,\/…၊။•↪⭐■▪━༻༺“”‘’–—]|[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, 
     ''
   );
+
+  // Replace '&' with 'and' and '%' with 'percent'
+  text = text.replace(/&/g, 'and').replace(/%/g, 'percent');
 
   // Save the text content as a .txt file with the same name as the opened file
   const blob = new Blob([text], { type: 'text/plain' });

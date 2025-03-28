@@ -1,19 +1,22 @@
-// Function to delete special characters and emojis
 function deleteSpecialCharacters() {
     const textarea = document.getElementById('main-text');
     var output = textarea.value;
     if (textarea) {
-        // Regex to remove special characters and emojis
+        // Regex to remove special characters and emojis, excluding full stop (.), '&', and '%'
         const outString = textarea.value.replace(
-            /[\\~!@#$%^&*()_\-+=`|{}\[\]:";'<>.,?\/…၊။•↪⭐■▪━༻༺“”‘’–—]|[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu, 
+            /[\\~!@#$^*()_\-+=`|{}\[\]:";'<>,?\/…၊။•↪⭐■▪━༻༺“”‘’–—]|[\uD800-\uDBFF][\uDC00-\uDFFF]|\p{Extended_Pictographic}/gu,
             ''
         );
-        output = removeNonEnglishSpaces(outString)
+        // Remove non-English spaces if needed
+        output = removeNonEnglishSpaces(outString);
+        // Replace '&' with 'and' and '%' with 'percent'
+        output = output.replace(/&/g, 'and').replace(/%/g, 'percent');
     }
     textarea.value = output;
     manualValueChange(output);
     copyAndRedirect();
 }
+
 
 
 function copyAndRedirect() {
