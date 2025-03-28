@@ -95,17 +95,36 @@ document.addEventListener("DOMContentLoaded", function () {
 /**
  * Checks if the match at matchIndex (with given length)
  * overlaps any hidden interval from globalHiddenIndexes.
+ * 
+ * If the search term is strictly longer than the hidden term
+ * (i.e., it fully contains the hidden term, even if at the start or end),
+ * then we return false, allowing deletion.
+ *
+ * However, if the search term is exactly the same as or inside a hidden interval,
+ * we return true, blocking the action.
  */
 function isInHiddenRanges(matchIndex, matchLength) {
     if (!globalHiddenIndexes || globalHiddenIndexes.length === 0) return false;
     const matchEnd = matchIndex + matchLength;
     for (let interval of globalHiddenIndexes) {
-        if (matchIndex < interval.end && matchEnd > interval.start) {
+        const hiddenStart = interval.start;
+        const hiddenEnd = interval.end;
+
+        // If the search term is strictly larger and fully contains the hidden range
+        // (even if the hidden range is at the start or end), ignore this hidden interval.
+        if (matchIndex <= hiddenStart && matchEnd >= hiddenEnd && matchLength > (hiddenEnd - hiddenStart)) {
+            continue;
+        }
+
+        // If there is any overlap (including exact match or partial containment), return true.
+        if (matchIndex < hiddenEnd && matchEnd > hiddenStart) {
             return true;
         }
     }
     return false;
 }
+
+
 
 
 /**

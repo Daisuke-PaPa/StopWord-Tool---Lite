@@ -46,6 +46,9 @@
       {"from":"$ANYု_ ဒ်_ ","to":"$ANYုဒ်_ "},
       {"from":"$ANY_ ာ_ ","to":"$ANYာ_ "},
       {"from":"_ $ANYှ_ ောက်_ ","to":"_ $ANYှောက်_ "},
+      {"from":"_ ္_ $ANYီ_","to":"္$ANYီ_"},
+      {"from":"$ANYြု_ ုံ","to":"$ANYြုံ"},
+      {"from":"$ANY_ ှ_ ဥ်း","to":"$ANYှဥ်း"},
     ]
 
     function applyRules(rules, output) {
