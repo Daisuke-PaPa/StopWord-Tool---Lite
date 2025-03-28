@@ -230,7 +230,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const swListTextbox = document.getElementById("sw_list");
 
   swListTextbox.addEventListener("keydown", function(event) {
-      if (event.key === "Backspace") {
+      if (event.key === "Backspace" && document.getElementById('auto_save').checked) {
           saveFile();
       }
   });

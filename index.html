@@ -190,7 +190,14 @@
                 <textarea id="main-text" placeholder="မုန့်စိန်လား?" class="custom-textarea" style="height: 85vh; width: 100%; font-size: 18px;line-height: 36px;"></textarea>
             </div>
             <div class="col s2" style="font-size: 17px; color: white; text-align: center;">
-                <span>StopWord List</span>
+                <div class="switch" style="color: white !important;">
+                    
+                    <label>
+                    <input type="checkbox" id="auto_save" checked>
+                    <span class="lever"></span>
+                    </label>
+                    <span>StopWord List</span>
+                </div>
                 <textarea id="sw_list" class="custom-textarea" style="height:33vh;"></textarea>
                 <ul class="pagination" style="text-align: center;">
                     <li class="waves-effect" id="sw_left" onclick="moveBackward()"><a ><i class="material-icons">chevron_left</i></a></li>
