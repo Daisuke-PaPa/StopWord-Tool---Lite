@@ -61,18 +61,29 @@ async function generateTableRows() {
     const classes = ["hide_list", "csw_list", "fix_segment"];
     let results = {};
 
+    let isEmpty = true;
+    
     classes.forEach(cls => {
         results[cls] = [];
         document.querySelectorAll(`td.${cls}`).forEach(td => {
             let text = td.innerText.trim();
-            if (text) results[cls].push(text);
+            if (text) {
+                results[cls].push(text);
+                isEmpty = false;
+            }
         });
     });
+
+    if (isEmpty) {
+        showStatusNotification('တစ်ခုခုထည့်လေဟ အကုန်ပျက်ကုန်မယ်');
+        return;
+    }
 
     console.log(results);
     saveToIndexedDB(results);
     return results;
 }
+
 
 async function saveToIndexedDB(data) {
     showStatusNotification("Saving...");
