@@ -108,8 +108,14 @@
   cursor: url("cursor.png"), auto !important;
 }
     </style>
+
+<script>
+    function myFunction() {
+      return "Write something clever here...";
+    }
+    </script>
 </head>
-<body style="background-color: #262626;">
+<body style="background-color: #262626;" onbeforeunload="return myFunction();">
     <nav>
         <div class="nav-wrapper">
             <div class="brand-logo center" onclick="checkPayday()" style="cursor: pointer;">
