@@ -8,12 +8,12 @@ var rules = [
   {"from":"$ANY_ ါ","to":"$ANYါ"},
   {"from":"$ANYိ_ ူ‌င်","to":"$ANYိူင်"},
   {"from":"$ANYိ_ ူး_","to":"$ANYိူး"},
-  {"from":"_ ေ‌$ANYျာ်","to":"_ $ANYျော်"},
+  {"from":"ေ‌$ANYျာ်","to":"$ANYျော်"},
   {"from":"$ANY_ ံး_","to":"$ANYံး_"},
   {"from":"$ANY_ ီး_","to":"$ANYီး_"},
   {"from":"$ANY_ ှ‌","to":"$ANYှ"},
-  {"from":"_ ေ_ $ANYး_","to":"_ $ANYေး_"},
-  {"from":"_ ေ_ $ANY_ း_","to":"_ $ANYေး_"},
+  {"from":"ေ_ $ANYး_","to":"$ANYေး_"},
+  {"from":"ေ_ $ANY_ း_","to":"$ANYေး_"},
   {"from":"$ANY_ း_","to":"$ANYး_"},
   {"from":"_ $ANY_ င့်","to":"_ $ANYင့်"},
   {"from":"_ ချ်_","to":"ချ်_"},
@@ -52,32 +52,32 @@ var rules = [
   {"from":"_ ေ$ANYြ","to":"_ $ANYြေ"},
   {"from":"$ANY_ မ်း","to":"$ANYမ်း"},
   {"from":"$ANY_ ဉ့်_ ","to":"$ANYဉ့်_ "},
-  //{"from":"ို_ $ANY်_ ","to":"ို$ANY်_ "},
-  //{"from":"ာ_ $ANY်_ ","to":"ာ$ANY်_ "},
+  {"from":"_ $ANY်_ ","to":"$ANY်_ "},
 ]
 
-    function applyRules(rules, output) {
-      rules.forEach(rule => {
-          // Convert "$ANY" into a regex group that captures characters up to an underscore
-          let regexPattern = rule.from
-              .replace(/\$ANY/g, "([^_\\s]+)") // Match sequences without underscores or spaces
-              .replace(/_/g, "_"); // Ensure underscores are matched literally
-      
-          let regex = new RegExp(regexPattern, "g");
-      
-          output = output.replace(regex, (...matches) => {
-              let replacement = rule.to;
-              let capturedIndex = 1;
-      
-              // Replace "$ANY" in "to" with captured values
-              replacement = replacement.replace(/\$ANY/g, () => matches[capturedIndex++] || "");
-      
-              return replacement;
-          });
+function applyRules(rules, output) {
+  rules.forEach(rule => {
+      // Convert "$ANY" into a regex group that captures exactly one character (not an underscore or space)
+      let regexPattern = rule.from
+          .replace(/\$ANY/g, "([^_\\s])") // Only one character is matched
+          .replace(/_/g, "_"); // Ensure underscores are matched literally
+  
+      let regex = new RegExp(regexPattern, "g");
+  
+      output = output.replace(regex, (...matches) => {
+          let replacement = rule.to;
+          let capturedIndex = 1;
+  
+          // Replace "$ANY" in "to" with captured values
+          replacement = replacement.replace(/\$ANY/g, () => matches[capturedIndex++] || "");
+  
+          return replacement;
       });
-      
-      return output;
-    }
+  });
+  
+  return output;
+}
+
   
 
   
